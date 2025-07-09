@@ -56,7 +56,11 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
     std::string filename = pspace.spin_model; // spin model info
     filename += "__" + pspace.couplings_filename;
     std::stringstream params_stream;
-    params_stream << "__beta=" << pspace.beta << "__rescale=" << pspace.rescale;
+    params_stream << "__beta=" << pspace.beta;
+    if( pspace.rescale != RealType{1.} )
+    {
+        params_stream << "__rescale=" << pspace.rescale;
+    }
     filename += params_stream.str(); 
 
     // create the file:

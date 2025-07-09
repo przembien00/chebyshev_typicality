@@ -19,7 +19,7 @@ State act_ISO( const State& state, const Hamiltonian& H )
 
     for( long i = 0; i < H.numSpins; ++i )
     {
-        for( long j = 0; j < H.numSpins; ++j )
+        for( long j = i; j < H.numSpins; ++j )
         {
             RealType J = H.couplings(i,j);
             if( J == RealType{0.0} ) continue; // skip zero couplings
@@ -39,7 +39,7 @@ State act_ISO( const State& state, const Hamiltonian& H )
                     new_state[ident] += - RealType{0.25} * J * state[ident];
                 }
 
-                // S_i^+ * S_j^- + S_i^- * S_j^+
+                // 0.5 * ( S_i^+ * S_j^- + S_i^- * S_j^+ )
 
                 if( ( ( ident >> i ) & 1L) ^ ( (ident >> j)  & 1L ) )
                 {

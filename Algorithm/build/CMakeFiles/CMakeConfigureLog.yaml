@@ -4653,3 +4653,43 @@ events:
         
       exitCode: 2
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:238 (try_compile)"
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:584 (_HDF5_test_regular_compiler_C)"
+      - "CMakeLists.txt:26 (find_package)"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-r9my12"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-r9my12"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_C_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-r9my12
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_67f81/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_67f81.dir/build.make CMakeFiles/cmTC_67f81.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-r9my12'
+        Building C object CMakeFiles/cmTC_67f81.dir/cmake_hdf5_test.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_67f81.dir/cmake_hdf5_test.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/hdf5/cmake_hdf5_test.c
+        Linking C executable cmTC_67f81
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_67f81.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_67f81.dir/cmake_hdf5_test.c.o -o cmTC_67f81 
+        /usr/bin/ld: CMakeFiles/cmTC_67f81.dir/cmake_hdf5_test.c.o: in function `main':
+        cmake_hdf5_test.c:(.text+0x3e): undefined reference to `H5check_version'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x43): undefined reference to `H5open'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x5c): undefined reference to `H5Fcreate'
+        collect2: error: ld returned 1 exit status
+        gmake[1]: *** [CMakeFiles/cmTC_67f81.dir/build.make:99: cmTC_67f81] Error 1
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-r9my12'
+        gmake: *** [Makefile:127: cmTC_67f81/fast] Error 2
+        
+      exitCode: 2
+...

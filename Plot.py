@@ -41,17 +41,20 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta=0.2
+beta_array = [0.1, 0.2, 0.3, 0.4, 0.5]
 
-all, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
-all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5")
+for beta in beta_array:
 
-G = [ gab for gab in all['results']['g_zz']]
-G_ed = [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']]
-print(G_ed[0][-1])
-print(G[-1])
-plt.plot(times, G, label = 'Chebyshev')
-plt.plot(times_ed, G_ed[0], label = 'ED')
+    all, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
+    all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5")
+
+    G = [ gab for gab in all['results']['g_zz']]
+    G_ed = [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']]
+    print(G_ed[0][-1])
+    print(G[-1])
+    G_mirror = np.concatenate((G[:int(len(G)/2)],np.flip(G[:int(len(G)/2)])))
+    plt.plot(times, G_mirror, label = 'Chebyshev')
+    plt.plot(times_ed, G_ed[0], '--', label = 'ED')
 
 plt.legend()
 

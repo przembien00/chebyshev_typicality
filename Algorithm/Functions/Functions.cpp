@@ -75,14 +75,14 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth )
 // Apply e^(-tH) to the state using the Chebyshev expansion technique.
 // The state is modified in place.
 {
-    State state_final = CET_coeff( 0, H.a * t ) * state; // |psi_0>
+    State state_final = CET_coeff( 0, H.a * t ) * state; // a_0|psi_0>
     State state_aux = H.act( state ); // |psi_1> = H|psi_0>
-    state_final += CET_coeff( 1, H.a * t ) * state_aux;
+    state_final += CET_coeff( 1, H.a * t ) * state_aux; // a_0|psi_0> + a_1|psi_1>
    
     for( uint n=2; n < depth + 1; n++ )
     {
         state = 2 * H.act( state_aux ) - state; // |psi_n> = 2H|psi_n-1> - |psi_n-2>
-        state_final += CET_coeff( n, H.a * t ) * state;
+        state_final += CET_coeff( n, H.a * t ) * state; // + a_n|psi_n> 
         std::swap( state, state_aux );
     }
     state = state_final;
