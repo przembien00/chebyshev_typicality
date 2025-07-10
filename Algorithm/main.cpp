@@ -14,12 +14,13 @@ RealType Z = RealType{0.};
 
 // Estimate the order of expansion needed to minimize the thermalization error.
 RealType bound = my_H.a * my_pspace.beta * RealType(0.25) * std::exp(1.0);
-uint depth_beta = static_cast<uint>(bound) + 20;
-std::cout << "beta N_C > " << depth_beta << '\n';
+uint depth_beta = static_cast<uint>(bound) + 10;
+std::cout << "thermalization error < " << std::pow( bound/static_cast<RealType>(depth_beta), static_cast<RealType>(depth_beta) ) << '\n';
 // Estimate the order of expansion needed to minimize the evolution error.
 bound = my_H.a * my_pspace.dt * RealType(0.5) * std::exp(1.0);
-uint depth_dt = static_cast<uint>(bound) + 3;
-std::cout << "dt N_C > " << depth_dt << '\n';
+uint depth_dt = static_cast<uint>(bound) + 5;
+std::cout << "time evolution error < " << std::pow( bound/static_cast<RealType>(depth_dt), static_cast<RealType>(depth_dt) ) << '\n';
+
 
 for( int k=0; k < my_pspace.num_Vectors; k++ )
 {
