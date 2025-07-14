@@ -17,7 +17,9 @@ namespace bpo = boost::program_options;
 // ==================== PARAMETER SPACE CLASS ====================
 // ===============================================================
 // constructor : build parameter space
-ParameterSpace::ParameterSpace( const int argC, char* const argV[] )
+ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int world_size, const int my_rank ):
+    my_rank( my_rank ),
+    world_size( world_size )
 {
     // 1a.) Define Options
     bpo::options_description description("All Options:");
@@ -56,13 +58,19 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[] )
     // ========== general numerical parameters ==========
     description_numerics.add_options()
     (
+    "seed", bpo::value<std::string>()->default_value("random"),
+    "set the seed for drawing the states"
+    )(
+    "ChebyshevCutoff", bpo::value<uint>()->default_value(uint{4}),
+    "set the cutoff order for Chebyshev expansion in time evolution"
+    )(
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
     "set the number of time points for the equidistant time discretization"
     )(
     "GaussCovariance", bpo::value<RealType>()->default_value(RealType{1.0}), 
     "set the covariance of the distribution used to draw random states"
     )(
-    "numVectors", bpo::value<uint>()->default_value(uint{1}),
+    "numVectorsPerCore", bpo::value<uint>()->default_value(uint{1}),
     "set the number of vectors drawn and averaged over"
     );
 
@@ -71,6 +79,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[] )
     (
     "project", bpo::value<std::string>()->default_value(""),
     "sort the data into a project folder"
+    )(
+    "fileext", bpo::value<std::string>()->default_value(""),
+    "Define an extension to the filename; it will be appended according to : filename__fileext"
     );
 
     description.add( description_help );
@@ -102,13 +113,16 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[] )
     CoordinationNumber = vm["z"].as<uint>();
 
     // ========== general numerical parameters ==========
+    seed = vm["seed"].as<std::string>();
+    Chebyshev_cutoff = vm["ChebyshevCutoff"].as<uint>();
     num_TimePoints = vm["numTimePoints"].as<uint>();
     dt = beta / static_cast<RealType>( num_TimePoints - 1);
-    num_Vectors = vm["numVectors"].as<uint>();
+    num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
     
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
+    filename_extension = vm["fileext"].as<std::string>();
 
 }
 

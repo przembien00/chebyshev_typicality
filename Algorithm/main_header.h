@@ -3,6 +3,7 @@
 #include<string>
 #include<blaze/Math.h>
 #include<cmath>
+#include<mpi.h>
 
 #include"Types/Types.h"
 

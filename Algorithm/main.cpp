@@ -4,29 +4,40 @@
 
 int main( const int argC, char* const argV[] )
 {
+// ====== Initialize MPI ======
+// world_size is the number of cores, my_rank is the number of "this" core 
+int world_size, my_rank;
+MPI_Init( nullptr, nullptr );
+MPI_Comm_size( MPI_COMM_WORLD, &world_size );
+MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
 
 // Initialize
-ps::ParameterSpace my_pspace( argC, argV );
+ps::ParameterSpace my_pspace( argC, argV, world_size, my_rank );
 ham::Hamiltonian my_H( my_pspace );
+size_t seed = func::generate_seed( my_pspace, my_rank );
+
 
 CorrTen Correlations(my_pspace.num_TimePoints);
 RealType Z = RealType{0.};
 
 // Estimate the order of expansion needed to minimize the thermalization error.
 RealType bound = my_H.a * my_pspace.beta * RealType(0.25) * std::exp(1.0);
-uint depth_beta = static_cast<uint>(bound) + 10;
+uint depth_beta = static_cast<uint>(bound) + 20;
 std::cout << "thermalization error < " << std::pow( bound/static_cast<RealType>(depth_beta), static_cast<RealType>(depth_beta) ) << '\n';
 // Estimate the order of expansion needed to minimize the evolution error.
-bound = my_H.a * my_pspace.dt * RealType(0.5) * std::exp(1.0);
-uint depth_dt = static_cast<uint>(bound) + 5;
+// bound = my_H.a * my_pspace.dt * RealType(0.5) * std::exp(1.0);
+uint depth_dt = static_cast<uint>(bound) + my_pspace.Chebyshev_cutoff;
 std::cout << "time evolution error < " << std::pow( bound/static_cast<RealType>(depth_dt), static_cast<RealType>(depth_dt) ) << '\n';
 
 
-for( int k=0; k < my_pspace.num_Vectors; k++ )
+for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 {
-    State psi_L = func::initialize_state( my_pspace ); // |psi_0>
+    State psi_L = func::initialize_state( my_pspace, seed, k ); // |psi_0>
+    if( my_rank == 0 )
+    {
+        std::cout << psi_L.at(0);
+    }
     // Thermalize. Compute Z.
-
     func::CET( my_H, psi_L, my_pspace.beta * RealType{0.5}, depth_beta ); // e^(-beta*H/2)|psi_0>
     Z += std::pow( std::real(blaze::norm(psi_L)) , 2 ); // Z = <psi_0|e^(-beta*H)|psi_0>
 
@@ -43,32 +54,13 @@ for( int k=0; k < my_pspace.num_Vectors; k++ )
     }
 }
 
-
-
-for( uint i = 0; i < Correlations.size(); i++ )
-{
-    Correlations[i] /= Z;
-    std::cout << Correlations[i] << '\n';
-}
+func::MPI_share_results( Z, Correlations );
+func::normalize( Z, Correlations );
 
 // Store correlations
-stor::HDF5_Storage my_data_storage( my_pspace );
+stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
 my_data_storage.store_main( my_pspace, Correlations );
 my_data_storage.finalize();
+MPI_Finalize();
 
 }
-
-    // std::cout << "a=" << my_H.a << '\n';
-    // State psi_test(my_pspace.HilbertSpaceDimension);
-    // psi_test[3] = 1;
-    // std::cout << "psi test" << '\n';
-    // for( uint i= 0; i < psi_test.size(); i++)
-    // {
-    //     std::cout << psi_test[i] << '\n';
-    // }
-    // psi_test = my_H.act(psi_test);
-    // std::cout << "psi test after H" << '\n';
-    // for( uint i= 0; i < psi_test.size(); i++)
-    // {
-    //     std::cout << psi_test[i] << '\n';
-    // }

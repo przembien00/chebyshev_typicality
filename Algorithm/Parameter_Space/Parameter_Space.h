@@ -21,13 +21,16 @@ class ParameterSpace
 
     // CONSTRUCTORS
     ParameterSpace() = default;
-    ParameterSpace( const int argC, char* const argV[] );
+    ParameterSpace( const int argC, char* const argV[], const int world_size, const int my_rank );
 
     // PUBLIC MEMBERS
     // Data storage
     std::string couplings_filename;
     std::string project_name;
-    
+    std::string filename_extension;
+    int my_rank;
+    int world_size;
+
     // Model parameters
     uint num_Spins;
     uint HilbertSpaceDimension;
@@ -38,8 +41,10 @@ class ParameterSpace
     RealType rescale;
 
     // Numerical parameters
+    uint Chebyshev_cutoff;
+    std::string seed;
     uint num_TimePoints;
-    uint num_Vectors;
+    uint num_Vectors_Per_Core;
     RealType Gauss_covariance; // Covariance of the distribution used to draw states
     RealType dt;
 

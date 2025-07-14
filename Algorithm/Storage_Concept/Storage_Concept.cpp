@@ -22,8 +22,8 @@ namespace hdf5r = HDF5_Routines;
 // ================= CLASS IMPLEMENTATIONS =================
 // HDF5 STORAGE CLASS
 // constructor : create folder tree and data file
-HDF5_Storage::HDF5_Storage( const ps::ParameterSpace& pspace ):
-    m_storing_permission( true ),
+HDF5_Storage::HDF5_Storage( const int my_rank, const ps::ParameterSpace& pspace ):
+    m_storing_permission( my_rank == 0 ),
     m_fname_max_length( 200 ),
     m_num_TriesToBuildFile( 5 )
 {
@@ -62,6 +62,10 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
         params_stream << "__rescale=" << pspace.rescale;
     }
     filename += params_stream.str(); 
+    if( pspace.filename_extension != "" )
+    {
+        filename += "__" + pspace.filename_extension;
+    }
 
     // create the file:
     print::cut_if_too_large( filename, m_fname_max_length );

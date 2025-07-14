@@ -15,12 +15,12 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Find MPI
-# find_package(MPI REQUIRED)
-# if(MPI_FOUND)
-#     set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
-#     include_directories(${MPI_INCLUDE_PATH})
-#     set(LINK_LIBS ${LINK_LIBS} ${MPI_LIBRARIES})
-# endif()
+find_package(MPI REQUIRED)
+if(MPI_FOUND)
+    set(CMAKE_CXX_COMPILER ${MPI_CXX_COMPILER})
+    include_directories(${MPI_INCLUDE_PATH})
+    set(LINK_LIBS ${LINK_LIBS} ${MPI_LIBRARIES})
+endif()
 
 # Find HDF5
 find_package(HDF5 REQUIRED)

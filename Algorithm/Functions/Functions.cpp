@@ -1,5 +1,6 @@
 #include"../Types/Types.h"
 #include"../Hamiltonians/Hamiltonians.h"
+#include<string>
 #include<cmath>
 #include<blaze/Math.h>
 #include<random>
@@ -17,12 +18,37 @@ RealType cdot( const State& state1, const State& state2 )
     return std::real(blaze::dot( blaze::conj(state1), state2 ));
 }
 
-State initialize_state( const ps::ParameterSpace& pspace )
-// Get a state with random (Gaussian) complex coefficients.
+size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank )
 {
+    if( pspace.seed.find("random") != std::string::npos ) // random seed
+    {
+        size_t seed{};
+        if( my_rank == 0 ) // draw seed on rank 0 
+        {
+            std::random_device my_seed{};
+            seed = my_seed();
+        }
+        MPI_Bcast( &seed, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD ); // broadcast seed to all the other ranks
+        return seed;
+    }  
+    else // preset seed
+    {
+        return std::stoi( pspace.seed );
+    }    
+}
+
+size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample )
+{
+    return (size_t) std::abs( static_cast<int>(seed) - static_cast<int>((sample + pow(10,5)) * (my_rank+1)) );
+}
+
+
+State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample )
+// Get a state with random (Gaussian) complex coefficients. The coeffs are drawn according to a seed
+// specified in the parameter space (by deafult random).
+{
+    std::mt19937 gen{ throw_seed( seed, pspace.my_rank, sample ) };
     State state(pspace.HilbertSpaceDimension);
-    std::random_device rd{}; 
-    std::mt19937 gen{rd()}; 
     std::normal_distribution<float> d{0., pspace.Gauss_covariance}; 
     
     for( uint i = 0; i < state.size(); ++i )
@@ -86,6 +112,29 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth )
         std::swap( state, state_aux );
     }
     state = state_final;
+}
+
+// sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce 
+void MPI_share_results( RealType& partition_function, CorrTen& spin_c )
+{
+    // share correlation results
+    std::vector<RealType> rcv_buf( spin_c.size() ); 
+    MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+    spin_c = rcv_buf;
+
+    // share partition function results
+    std::vector<RealType> send_buf = { partition_function };
+    std::vector<RealType> receive_buf( 1 );
+    MPI_Allreduce( send_buf.data(), receive_buf.data(), 1, MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+    partition_function = receive_buf.at(0);
+}
+
+void normalize( RealType& partition_function, CorrTen& spin_c )
+{
+    for( uint i = 0; i < spin_c.size(); i++ )
+    {
+        spin_c[i] /= partition_function;
+    }
 }
 
 }
