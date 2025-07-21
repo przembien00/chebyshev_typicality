@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # things to be adapted
-set(USE_TYPE FLOAT)  # specify the type to be used (FLOAT or DOUBLE)
+set(USE_TYPE DOUBLE)  # specify the type to be used (FLOAT or DOUBLE)
 include_directories(/data/bieniek)  # path to blaze
 #add_definitions(-DEIGEN)  # remove #, if eigen instead of lapack should be used for diagonalization
 
@@ -38,9 +38,6 @@ endif()
 # Add definitions
 add_definitions(-DUSE_${USE_TYPE})
 
-# Include directories
-include_directories(../../cpp_libs)
-
 # Source files
 set(SOURCES
     main.cpp
@@ -54,10 +51,11 @@ set(SOURCES
 # Header files (for dependencies)
 set(GLOB_RECURSE HEADERS
     "main_header.h"
-    "Types/.h"
+    "Types/*.h"
     "Parameter_Space/*.h"
     "Functions/*.h"
     "Storage_Concept/*.h"
+    "cpp_libs/*.h"
 )
 
 # Add executable

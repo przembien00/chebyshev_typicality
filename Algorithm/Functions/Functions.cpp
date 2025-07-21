@@ -49,7 +49,7 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
 {
     std::mt19937 gen{ throw_seed( seed, pspace.my_rank, sample ) };
     State state(pspace.HilbertSpaceDimension);
-    std::normal_distribution<float> d{0., pspace.Gauss_covariance}; 
+    std::normal_distribution<RealType> d{0., pspace.Gauss_covariance}; 
     
     for( uint i = 0; i < state.size(); ++i )
     {
@@ -97,6 +97,7 @@ RealType CET_coeff( int n, RealType x )
     }
 }
 
+
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth )
 // Apply e^(-tH) to the state using the Chebyshev expansion technique.
 // The state is modified in place.
@@ -112,6 +113,17 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth )
         std::swap( state, state_aux );
     }
     state = state_final;
+}
+
+State RK4( ham::Hamiltonian& H, State& state, const RealType dt )
+{
+    State state_out = state;
+    for( uint n = 1; n < 5; n++ )
+    {
+        state = H.act( state ) * dt / static_cast<RealType>(n);
+        state_out += state;
+    }
+    return state_out;
 }
 
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce 

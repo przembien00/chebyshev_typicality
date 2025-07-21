@@ -50,9 +50,6 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "rescale", bpo::value<RealType>()->default_value(RealType{1.0}),
     "the factor rescale is multiplied to the couplings (for example for them to be in units of JQ)"
-    )(
-    "z", bpo::value<uint>()->default_value(uint{4}),
-    "set the value of the coordination number"
     );
 
     // ========== general numerical parameters ==========
@@ -61,7 +58,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "seed", bpo::value<std::string>()->default_value("random"),
     "set the seed for drawing the states"
     )(
-    "ChebyshevCutoff", bpo::value<uint>()->default_value(uint{4}),
+    "ChebyshevCutoff", bpo::value<uint>()->default_value(uint{3}),
     "set the cutoff order for Chebyshev expansion in time evolution"
     )(
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
@@ -72,6 +69,12 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "numVectorsPerCore", bpo::value<uint>()->default_value(uint{1}),
     "set the number of vectors drawn and averaged over"
+    )(
+    "ChebyshevRescale", bpo::value<RealType>()->default_value(RealType{4}),
+    "set the rescaling of the Hamiltonian for CET"
+    )(
+    "dt", bpo::value<RealType>()->default_value(RealType{0.05}),
+    "set the timestep, RK4 error scales like dt^5"
     );
 
     // ========== storing and naming ==========
@@ -110,16 +113,17 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     HilbertSpaceDimension = 1 << num_Spins; // 2^num_Spins
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
-    CoordinationNumber = vm["z"].as<uint>();
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
     Chebyshev_cutoff = vm["ChebyshevCutoff"].as<uint>();
-    num_TimePoints = vm["numTimePoints"].as<uint>();
-    dt = beta / static_cast<RealType>( num_TimePoints - 1);
+    dt = vm["dt"].as<RealType>();
+    num_TimePoints = static_cast<uint>( beta / dt );
+    num_TimeSteps_therm = static_cast<uint>( beta * RealType{0.5} / dt );
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
-    
+    CET_rescale = vm["ChebyshevRescale"].as<RealType>();
+
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
     filename_extension = vm["fileext"].as<std::string>();

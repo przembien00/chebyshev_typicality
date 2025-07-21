@@ -20,6 +20,8 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
 
 State S_z_0_act( const State& state );
 
+State RK4( ham::Hamiltonian& H, State& state, const RealType dt );
+
 RealType CET_coeff( int n, RealType x );
 
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth );

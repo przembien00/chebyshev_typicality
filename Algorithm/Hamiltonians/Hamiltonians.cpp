@@ -56,7 +56,7 @@ State act_ISO( const State& state, const Hamiltonian& H )
 
 Hamiltonian::Hamiltonian( const ps::ParameterSpace& pspace ):
 numSpins( pspace.num_Spins ),
-coord_num( pspace.CoordinationNumber ),
+CET_rescale( pspace.CET_rescale ),
 dim( pspace.HilbertSpaceDimension ),
 couplings( pspace.couplings )
 {
@@ -74,8 +74,8 @@ couplings( pspace.couplings )
             }
         }
     }
-    a = RealType{0.25} * J * static_cast<RealType>(numSpins) * static_cast<RealType>(coord_num);
-    couplings = couplings / a;
+    a = RealType{0.25} * J * static_cast<RealType>(numSpins) * CET_rescale;
+    // couplings = couplings / a;
     
     // Define a mapping from models to actions of the Hamiltonian
     std::map< std::string, std::function< State( const State&, const Hamiltonian& ) > > model_map{

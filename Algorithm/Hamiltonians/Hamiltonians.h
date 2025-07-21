@@ -19,7 +19,7 @@ class Hamiltonian
     public:
     long numSpins;
     long dim;
-    long coord_num;
+    RealType CET_rescale;
     CouplingMatrix couplings;
     Parameters params;
     RealType a;

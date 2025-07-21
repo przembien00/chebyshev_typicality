@@ -34,7 +34,6 @@ class ParameterSpace
     // Model parameters
     uint num_Spins;
     uint HilbertSpaceDimension;
-    uint CoordinationNumber;
     CouplingMatrix couplings; // Coupling matrix
     std::string spin_model;
     RealType beta; // Inverse temperature
@@ -44,10 +43,12 @@ class ParameterSpace
     uint Chebyshev_cutoff;
     std::string seed;
     uint num_TimePoints;
+    uint num_TimeSteps_therm;
     uint num_Vectors_Per_Core;
     RealType Gauss_covariance; // Covariance of the distribution used to draw states
     RealType dt;
-
+    RealType CET_rescale;
+    RealType dt_therm;
 
     // PUBLIC METHODS
     void read_SpinSystem();

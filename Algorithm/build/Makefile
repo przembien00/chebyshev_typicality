@@ -117,24 +117,24 @@ depend:
 .PHONY : depend
 
 #=============================================================================
-# Target rules for targets named chebyshev_FLOAT
+# Target rules for targets named chebyshev_DOUBLE
 
 # Build rule for target.
-chebyshev_FLOAT: cmake_check_build_system
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 chebyshev_FLOAT
-.PHONY : chebyshev_FLOAT
+chebyshev_DOUBLE: cmake_check_build_system
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/Makefile2 chebyshev_DOUBLE
+.PHONY : chebyshev_DOUBLE
 
 # fast build rule for target.
-chebyshev_FLOAT/fast:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/build
-.PHONY : chebyshev_FLOAT/fast
+chebyshev_DOUBLE/fast:
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/build
+.PHONY : chebyshev_DOUBLE/fast
 
 Functions/Functions.o: Functions/Functions.cpp.o
 .PHONY : Functions/Functions.o
 
 # target to build an object file
 Functions/Functions.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Functions/Functions.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Functions/Functions.cpp.o
 .PHONY : Functions/Functions.cpp.o
 
 Functions/Functions.i: Functions/Functions.cpp.i
@@ -142,7 +142,7 @@ Functions/Functions.i: Functions/Functions.cpp.i
 
 # target to preprocess a source file
 Functions/Functions.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Functions/Functions.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Functions/Functions.cpp.i
 .PHONY : Functions/Functions.cpp.i
 
 Functions/Functions.s: Functions/Functions.cpp.s
@@ -150,7 +150,7 @@ Functions/Functions.s: Functions/Functions.cpp.s
 
 # target to generate assembly for a file
 Functions/Functions.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Functions/Functions.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Functions/Functions.cpp.s
 .PHONY : Functions/Functions.cpp.s
 
 Hamiltonians/Hamiltonians.o: Hamiltonians/Hamiltonians.cpp.o
@@ -158,7 +158,7 @@ Hamiltonians/Hamiltonians.o: Hamiltonians/Hamiltonians.cpp.o
 
 # target to build an object file
 Hamiltonians/Hamiltonians.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Hamiltonians/Hamiltonians.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Hamiltonians/Hamiltonians.cpp.o
 .PHONY : Hamiltonians/Hamiltonians.cpp.o
 
 Hamiltonians/Hamiltonians.i: Hamiltonians/Hamiltonians.cpp.i
@@ -166,7 +166,7 @@ Hamiltonians/Hamiltonians.i: Hamiltonians/Hamiltonians.cpp.i
 
 # target to preprocess a source file
 Hamiltonians/Hamiltonians.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Hamiltonians/Hamiltonians.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Hamiltonians/Hamiltonians.cpp.i
 .PHONY : Hamiltonians/Hamiltonians.cpp.i
 
 Hamiltonians/Hamiltonians.s: Hamiltonians/Hamiltonians.cpp.s
@@ -174,7 +174,7 @@ Hamiltonians/Hamiltonians.s: Hamiltonians/Hamiltonians.cpp.s
 
 # target to generate assembly for a file
 Hamiltonians/Hamiltonians.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Hamiltonians/Hamiltonians.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Hamiltonians/Hamiltonians.cpp.s
 .PHONY : Hamiltonians/Hamiltonians.cpp.s
 
 Parameter_Space/Parameter_Space.o: Parameter_Space/Parameter_Space.cpp.o
@@ -182,7 +182,7 @@ Parameter_Space/Parameter_Space.o: Parameter_Space/Parameter_Space.cpp.o
 
 # target to build an object file
 Parameter_Space/Parameter_Space.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Parameter_Space/Parameter_Space.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Parameter_Space/Parameter_Space.cpp.o
 .PHONY : Parameter_Space/Parameter_Space.cpp.o
 
 Parameter_Space/Parameter_Space.i: Parameter_Space/Parameter_Space.cpp.i
@@ -190,7 +190,7 @@ Parameter_Space/Parameter_Space.i: Parameter_Space/Parameter_Space.cpp.i
 
 # target to preprocess a source file
 Parameter_Space/Parameter_Space.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Parameter_Space/Parameter_Space.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Parameter_Space/Parameter_Space.cpp.i
 .PHONY : Parameter_Space/Parameter_Space.cpp.i
 
 Parameter_Space/Parameter_Space.s: Parameter_Space/Parameter_Space.cpp.s
@@ -198,7 +198,7 @@ Parameter_Space/Parameter_Space.s: Parameter_Space/Parameter_Space.cpp.s
 
 # target to generate assembly for a file
 Parameter_Space/Parameter_Space.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Parameter_Space/Parameter_Space.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Parameter_Space/Parameter_Space.cpp.s
 .PHONY : Parameter_Space/Parameter_Space.cpp.s
 
 Storage_Concept/Storage_Concept.o: Storage_Concept/Storage_Concept.cpp.o
@@ -206,7 +206,7 @@ Storage_Concept/Storage_Concept.o: Storage_Concept/Storage_Concept.cpp.o
 
 # target to build an object file
 Storage_Concept/Storage_Concept.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Storage_Concept/Storage_Concept.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Storage_Concept/Storage_Concept.cpp.o
 .PHONY : Storage_Concept/Storage_Concept.cpp.o
 
 Storage_Concept/Storage_Concept.i: Storage_Concept/Storage_Concept.cpp.i
@@ -214,7 +214,7 @@ Storage_Concept/Storage_Concept.i: Storage_Concept/Storage_Concept.cpp.i
 
 # target to preprocess a source file
 Storage_Concept/Storage_Concept.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Storage_Concept/Storage_Concept.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Storage_Concept/Storage_Concept.cpp.i
 .PHONY : Storage_Concept/Storage_Concept.cpp.i
 
 Storage_Concept/Storage_Concept.s: Storage_Concept/Storage_Concept.cpp.s
@@ -222,7 +222,7 @@ Storage_Concept/Storage_Concept.s: Storage_Concept/Storage_Concept.cpp.s
 
 # target to generate assembly for a file
 Storage_Concept/Storage_Concept.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/Storage_Concept/Storage_Concept.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/Storage_Concept/Storage_Concept.cpp.s
 .PHONY : Storage_Concept/Storage_Concept.cpp.s
 
 main.o: main.cpp.o
@@ -230,7 +230,7 @@ main.o: main.cpp.o
 
 # target to build an object file
 main.cpp.o:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/main.cpp.o
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o
 .PHONY : main.cpp.o
 
 main.i: main.cpp.i
@@ -238,7 +238,7 @@ main.i: main.cpp.i
 
 # target to preprocess a source file
 main.cpp.i:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/main.cpp.i
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.i
 .PHONY : main.cpp.i
 
 main.s: main.cpp.s
@@ -246,7 +246,7 @@ main.s: main.cpp.s
 
 # target to generate assembly for a file
 main.cpp.s:
-	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_FLOAT.dir/build.make CMakeFiles/chebyshev_FLOAT.dir/main.cpp.s
+	$(MAKE) $(MAKESILENT) -f CMakeFiles/chebyshev_DOUBLE.dir/build.make CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.s
 .PHONY : main.cpp.s
 
 # Help Target
@@ -257,7 +257,7 @@ help:
 	@echo "... depend"
 	@echo "... edit_cache"
 	@echo "... rebuild_cache"
-	@echo "... chebyshev_FLOAT"
+	@echo "... chebyshev_DOUBLE"
 	@echo "... Functions/Functions.o"
 	@echo "... Functions/Functions.i"
 	@echo "... Functions/Functions.s"

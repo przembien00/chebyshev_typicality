@@ -41,25 +41,25 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.1]
+beta_array = [1]
 
 for beta in beta_array:
 
-    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5XX")
-    all_2, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5XXXX")
+    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5")
 
     G_1 = np.array( [ gab for gab in all_1['results']['g_zz']] )
-    G_2 = np.array( [ gab for gab in all_2['results']['g_zz']] )
+    print(G_1)
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
     # G_mirror = np.concatenate((G[:int(len(G)/2)],np.flip(G[:int(len(G)/2)])))
-    plt.plot(times, np.abs(G_1-G_2), label = rf'Chebyshev, $\beta$={beta:.2g}')
+    plt.plot(times, G_1, label = rf'Chebyshev, $\beta$={beta:.2g}')
     # plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')
+# plt.ylim(0, 0.5)
 plt.legend()
 
-plt.savefig("Plots/Test.pdf")
+plt.savefig("Plots/Test_bigT.pdf")
