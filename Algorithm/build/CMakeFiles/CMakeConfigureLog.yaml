@@ -5361,3 +5361,531 @@ events:
         
       exitCode: 2
 ...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:18 (find_package)"
+    description: "The MPI test test_mpi for C in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_C_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4e907/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4e907.dir/build.make CMakeFiles/cmTC_4e907.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W'
+        Building C object CMakeFiles/cmTC_4e907.dir/test_mpi.c.o
+        /usr/bin/cc  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_4e907.dir/test_mpi.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W/test_mpi.c
+        Linking C executable cmTC_4e907
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4e907.dir/link.txt --verbose=1
+        /usr/bin/cc -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_4e907.dir/test_mpi.c.o -o cmTC_4e907  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-MwL14W'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:18 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_7f76b/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7f76b.dir/build.make CMakeFiles/cmTC_7f76b.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh'
+        Building CXX object CMakeFiles/cmTC_7f76b.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_7f76b.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh/test_mpi.cpp
+        Linking CXX executable cmTC_7f76b
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7f76b.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_7f76b.dir/test_mpi.cpp.o -o cmTC_7f76b  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-nBm7Qh'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1672 (_MPI_try_staged_settings)"
+      - "CMakeLists.txt:18 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode MPICXX"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_MPICXX"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_107dd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_107dd.dir/build.make CMakeFiles/cmTC_107dd.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q'
+        Building CXX object CMakeFiles/cmTC_107dd.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_107dd.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q/test_mpi.cpp
+        Linking CXX executable cmTC_107dd
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_107dd.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_107dd.dir/test_mpi.cpp.o -o cmTC_107dd  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-5Y4q9Q'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:238 (try_compile)"
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:584 (_HDF5_test_regular_compiler_C)"
+      - "CMakeLists.txt:26 (find_package)"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-lr0TNn"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-lr0TNn"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_C_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-lr0TNn
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_7940c/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_7940c.dir/build.make CMakeFiles/cmTC_7940c.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-lr0TNn'
+        Building C object CMakeFiles/cmTC_7940c.dir/cmake_hdf5_test.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_7940c.dir/cmake_hdf5_test.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/hdf5/cmake_hdf5_test.c
+        Linking C executable cmTC_7940c
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_7940c.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_7940c.dir/cmake_hdf5_test.c.o -o cmTC_7940c 
+        /usr/bin/ld: CMakeFiles/cmTC_7940c.dir/cmake_hdf5_test.c.o: in function `main':
+        cmake_hdf5_test.c:(.text+0x3e): undefined reference to `H5check_version'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x43): undefined reference to `H5open'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x5c): undefined reference to `H5Fcreate'
+        collect2: error: ld returned 1 exit status
+        gmake[1]: *** [CMakeFiles/cmTC_7940c.dir/build.make:99: cmTC_7940c] Error 1
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-lr0TNn'
+        gmake: *** [Makefile:127: cmTC_7940c/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for C in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_C_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_427cd/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_427cd.dir/build.make CMakeFiles/cmTC_427cd.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM'
+        Building C object CMakeFiles/cmTC_427cd.dir/test_mpi.c.o
+        /usr/bin/cc  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_427cd.dir/test_mpi.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM/test_mpi.c
+        Linking C executable cmTC_427cd
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_427cd.dir/link.txt --verbose=1
+        /usr/bin/cc -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_427cd.dir/test_mpi.c.o -o cmTC_427cd  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-uJLiVM'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_72870/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_72870.dir/build.make CMakeFiles/cmTC_72870.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF'
+        Building CXX object CMakeFiles/cmTC_72870.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_72870.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF/test_mpi.cpp
+        Linking CXX executable cmTC_72870
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_72870.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_72870.dir/test_mpi.cpp.o -o cmTC_72870  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8wsIAF'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1672 (_MPI_try_staged_settings)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode MPICXX"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_MPICXX"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4a471/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4a471.dir/build.make CMakeFiles/cmTC_4a471.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu'
+        Building CXX object CMakeFiles/cmTC_4a471.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_4a471.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu/test_mpi.cpp
+        Linking CXX executable cmTC_4a471
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4a471.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_4a471.dir/test_mpi.cpp.o -o cmTC_4a471  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-apQnbu'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:238 (try_compile)"
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:584 (_HDF5_test_regular_compiler_C)"
+      - "CMakeLists.txt:27 (find_package)"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8CTgoX"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8CTgoX"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_C_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8CTgoX
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_07354/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_07354.dir/build.make CMakeFiles/cmTC_07354.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8CTgoX'
+        Building C object CMakeFiles/cmTC_07354.dir/cmake_hdf5_test.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_07354.dir/cmake_hdf5_test.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/hdf5/cmake_hdf5_test.c
+        Linking C executable cmTC_07354
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_07354.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_07354.dir/cmake_hdf5_test.c.o -o cmTC_07354 
+        /usr/bin/ld: CMakeFiles/cmTC_07354.dir/cmake_hdf5_test.c.o: in function `main':
+        cmake_hdf5_test.c:(.text+0x3e): undefined reference to `H5check_version'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x43): undefined reference to `H5open'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x5c): undefined reference to `H5Fcreate'
+        collect2: error: ld returned 1 exit status
+        gmake[1]: *** [CMakeFiles/cmTC_07354.dir/build.make:99: cmTC_07354] Error 1
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8CTgoX'
+        gmake: *** [Makefile:127: cmTC_07354/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for C in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_C_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_9ab3f/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_9ab3f.dir/build.make CMakeFiles/cmTC_9ab3f.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E'
+        Building C object CMakeFiles/cmTC_9ab3f.dir/test_mpi.c.o
+        /usr/bin/cc  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_9ab3f.dir/test_mpi.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E/test_mpi.c
+        Linking C executable cmTC_9ab3f
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9ab3f.dir/link.txt --verbose=1
+        /usr/bin/cc -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_9ab3f.dir/test_mpi.c.o -o cmTC_9ab3f  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-VR4x5E'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_44628/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_44628.dir/build.make CMakeFiles/cmTC_44628.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw'
+        Building CXX object CMakeFiles/cmTC_44628.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_44628.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw/test_mpi.cpp
+        Linking CXX executable cmTC_44628
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_44628.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_44628.dir/test_mpi.cpp.o -o cmTC_44628  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-tANEKw'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1672 (_MPI_try_staged_settings)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode MPICXX"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_MPICXX"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_99d0d/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_99d0d.dir/build.make CMakeFiles/cmTC_99d0d.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c'
+        Building CXX object CMakeFiles/cmTC_99d0d.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_99d0d.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c/test_mpi.cpp
+        Linking CXX executable cmTC_99d0d
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_99d0d.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_99d0d.dir/test_mpi.cpp.o -o cmTC_99d0d  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-jgfj4c'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:238 (try_compile)"
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:584 (_HDF5_test_regular_compiler_C)"
+      - "CMakeLists.txt:27 (find_package)"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-q89VMm"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-q89VMm"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_C_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-q89VMm
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_4ebae/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_4ebae.dir/build.make CMakeFiles/cmTC_4ebae.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-q89VMm'
+        Building C object CMakeFiles/cmTC_4ebae.dir/cmake_hdf5_test.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_4ebae.dir/cmake_hdf5_test.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/hdf5/cmake_hdf5_test.c
+        Linking C executable cmTC_4ebae
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_4ebae.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_4ebae.dir/cmake_hdf5_test.c.o -o cmTC_4ebae 
+        /usr/bin/ld: CMakeFiles/cmTC_4ebae.dir/cmake_hdf5_test.c.o: in function `main':
+        cmake_hdf5_test.c:(.text+0x3e): undefined reference to `H5check_version'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x43): undefined reference to `H5open'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x5c): undefined reference to `H5Fcreate'
+        collect2: error: ld returned 1 exit status
+        gmake[1]: *** [CMakeFiles/cmTC_4ebae.dir/build.make:99: cmTC_4ebae] Error 1
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-q89VMm'
+        gmake: *** [Makefile:127: cmTC_4ebae/fast] Error 2
+        
+      exitCode: 2
+...
+
+---
+events:
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for C in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_C_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_78890/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_78890.dir/build.make CMakeFiles/cmTC_78890.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy'
+        Building C object CMakeFiles/cmTC_78890.dir/test_mpi.c.o
+        /usr/bin/cc  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_78890.dir/test_mpi.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy/test_mpi.c
+        Linking C executable cmTC_78890
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_78890.dir/link.txt --verbose=1
+        /usr/bin/cc -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_78890.dir/test_mpi.c.o -o cmTC_78890  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-Y4wPmy'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1322 (_MPI_try_staged_settings)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1645 (_MPI_check_lang_works)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode normal"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_normal"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_b67f9/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_b67f9.dir/build.make CMakeFiles/cmTC_b67f9.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR'
+        Building CXX object CMakeFiles/cmTC_b67f9.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_b67f9.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR/test_mpi.cpp
+        Linking CXX executable cmTC_b67f9
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_b67f9.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_b67f9.dir/test_mpi.cpp.o -o cmTC_b67f9  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-8O5JeR'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1278 (try_compile)"
+      - "/usr/share/cmake/Modules/FindMPI.cmake:1672 (_MPI_try_staged_settings)"
+      - "CMakeLists.txt:19 (find_package)"
+    description: "The MPI test test_mpi for CXX in mode MPICXX"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: ""
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "MPI_RESULT_CXX_test_mpi_MPICXX"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_57480/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_57480.dir/build.make CMakeFiles/cmTC_57480.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO'
+        Building CXX object CMakeFiles/cmTC_57480.dir/test_mpi.cpp.o
+        /usr/bin/c++  -isystem /usr/include/openmpi-x86_64  -o CMakeFiles/cmTC_57480.dir/test_mpi.cpp.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO/test_mpi.cpp
+        Linking CXX executable cmTC_57480
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_57480.dir/link.txt --verbose=1
+        /usr/bin/c++ -Wl,-rpath -Wl,/usr/lib64/openmpi/lib -Wl,--enable-new-dtags CMakeFiles/cmTC_57480.dir/test_mpi.cpp.o -o cmTC_57480  -Wl,-rpath,/usr/lib64/openmpi/lib /usr/lib64/openmpi/lib/libmpi_cxx.so /usr/lib64/openmpi/lib/libmpi.so 
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-kwhPqO'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:238 (try_compile)"
+      - "/usr/share/cmake/Modules/FindHDF5.cmake:584 (_HDF5_test_regular_compiler_C)"
+      - "CMakeLists.txt:27 (find_package)"
+    directories:
+      source: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-wBl7V5"
+      binary: "/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-wBl7V5"
+    cmakeVariables:
+      CMAKE_C_FLAGS: ""
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: ""
+    buildResult:
+      variable: "HDF5_C_COMPILER_NO_INTERROGATE"
+      cached: true
+      stdout: |
+        Change Dir: /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-wBl7V5
+        
+        Run Build Command(s):/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_f22a0/fast && /usr/bin/gmake  -f CMakeFiles/cmTC_f22a0.dir/build.make CMakeFiles/cmTC_f22a0.dir/build
+        gmake[1]: Entering directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-wBl7V5'
+        Building C object CMakeFiles/cmTC_f22a0.dir/cmake_hdf5_test.c.o
+        /usr/bin/cc    -o CMakeFiles/cmTC_f22a0.dir/cmake_hdf5_test.c.o -c /data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/hdf5/cmake_hdf5_test.c
+        Linking C executable cmTC_f22a0
+        /usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_f22a0.dir/link.txt --verbose=1
+        /usr/bin/cc CMakeFiles/cmTC_f22a0.dir/cmake_hdf5_test.c.o -o cmTC_f22a0 
+        /usr/bin/ld: CMakeFiles/cmTC_f22a0.dir/cmake_hdf5_test.c.o: in function `main':
+        cmake_hdf5_test.c:(.text+0x3e): undefined reference to `H5check_version'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x43): undefined reference to `H5open'
+        /usr/bin/ld: cmake_hdf5_test.c:(.text+0x5c): undefined reference to `H5Fcreate'
+        collect2: error: ld returned 1 exit status
+        gmake[1]: *** [CMakeFiles/cmTC_f22a0.dir/build.make:99: cmTC_f22a0] Error 1
+        gmake[1]: Leaving directory '/data/bieniek/Projects/chebyshev_typicality/Algorithm/build/CMakeFiles/CMakeScratch/TryCompile-wBl7V5'
+        gmake: *** [Makefile:127: cmTC_f22a0/fast] Error 2
+        
+      exitCode: 2
+...

@@ -13,7 +13,7 @@ for((i=0;i<$len;i++))
 do
 	n="${data[$i]}"
 	echo "RUNNING JOB WITH NUMBER OF VECTORS = "$n
-	mpirun -n 4 executable_DOUBLE.out --spinmodel=ISO --srcfile=Square_NN_PBC_N=16 --beta=0.5 --numVectorsPerCore=$n --rescale=0.5 --dt=0.001 --fileext="numVecPerCore=$n" --project="NumVec_DOUBLE"
+	mpirun -n 4 executable_DOUBLE.out --spinmodel=ISO --srcfile=Square_NN_PBC_N=16 --beta=4 --numVectorsPerCore=$n --numTimePoints=100 --rescale=0.5 --ChebyshevCutoff=5 --fileext="numVecPerCore=$n" --project="NumVec_DOUBLE"
 
 wait
 done

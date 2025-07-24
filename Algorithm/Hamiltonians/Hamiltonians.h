@@ -23,6 +23,8 @@ class Hamiltonian
     CouplingMatrix couplings;
     Parameters params;
     RealType a;
+    RealType b;
+    RealType b_over_a;
 
     // constructors
     Hamiltonian() = default;

@@ -3805,7 +3805,16 @@ CMakeFiles/chebyshev_DOUBLE.dir/Hamiltonians/Hamiltonians.cpp.o: /data/bieniek/P
   /usr/include/openmpi-x86_64/H5FDsec2.h \
   /usr/include/openmpi-x86_64/H5FDsplitter.h \
   /usr/include/openmpi-x86_64/H5FDstdio.h \
-  /usr/include/openmpi-x86_64/H5VLpassthru.h
+  /usr/include/openmpi-x86_64/H5VLpassthru.h \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/eigenpair_manager.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_util.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/common.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/linear_algebra.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/common.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal_impl.hpp \
+  /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal_impl.hpp
 
 CMakeFiles/chebyshev_DOUBLE.dir/Parameter_Space/Parameter_Space.cpp.o: /data/bieniek/Projects/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp \
   /usr/include/stdc-predef.h \
@@ -10153,6 +10162,9 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
   /usr/include/openmpi-x86_64/openmpi/ompi/mpi/cxx/info_inln.h \
   /usr/include/openmpi-x86_64/openmpi/ompi/mpi/cxx/win_inln.h \
   /usr/include/openmpi-x86_64/openmpi/ompi/mpi/cxx/file_inln.h \
+  /usr/include/c++/11/chrono \
+  /usr/include/c++/11/ratio \
+  /usr/include/c++/11/bits/parse_numbers.h \
   /data/bieniek/Projects/chebyshev_typicality/Algorithm/Types/Types.h \
   /data/bieniek/Projects/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.h \
   /usr/include/openmpi-x86_64/hdf5.h \
@@ -10214,9 +10226,10 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
   /data/bieniek/Projects/chebyshev_typicality/Algorithm/Hamiltonians/Hamiltonians.h \
   /data/bieniek/Projects/chebyshev_typicality/Algorithm/Storage_Concept/Storage_Concept.h \
   /data/bieniek/Projects/chebyshev_typicality/Algorithm/cpp_libs/HDF5_Routines.h \
-  /usr/include/c++/11/variant \
-  /usr/include/c++/11/bits/parse_numbers.h
+  /usr/include/c++/11/variant
 
+
+/usr/include/c++/11/chrono:
 
 /data/bieniek/Projects/chebyshev_typicality/Algorithm/main_header.h:
 
@@ -10522,6 +10535,14 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/boost/lexical_cast/detail/converter_lexical_streams.hpp:
 
+/usr/include/boost/move/detail/std_ns_begin.hpp:
+
+/usr/include/boost/container/container_fwd.hpp:
+
+/usr/include/boost/core/swap.hpp:
+
+/usr/include/boost/swap.hpp:
+
 /data/bieniek/blaze/math/simd/Erfc.h:
 
 /data/bieniek/blaze/math/Epsilon.h:
@@ -10595,8 +10616,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 /data/bieniek/blaze/math/simd/Min.h:
 
 /data/bieniek/blaze/math/expressions/DVecSVecMultExpr.h:
-
-/usr/include/boost/move/detail/std_ns_begin.hpp:
 
 /data/bieniek/blaze/math/expressions/SVecSerialExpr.h:
 
@@ -12472,6 +12491,8 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/c++/11/tr1/exp_integral.tcc:
 
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/eigenpair_manager.hpp:
+
 /usr/include/bits/types/__fpos_t.h:
 
 /data/bieniek/blaze/config/Inline.h:
@@ -13042,8 +13063,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /data/bieniek/blaze/math/typetraits/HasSIMDShiftRV.h:
 
-/data/bieniek/blaze/math/functors/Real.h:
-
 /data/bieniek/Projects/chebyshev_typicality/Algorithm/Functions/Functions.h:
 
 /data/bieniek/blaze/math/views/band/BandData.h:
@@ -13452,6 +13471,10 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /data/bieniek/blaze/math/expressions/SMatDeclDiagExpr.h:
 
+/usr/include/boost/array.hpp:
+
+/data/bieniek/blaze/math/constraints/Diagonal.h:
+
 /data/bieniek/blaze/math/shims/IsZero.h:
 
 /data/bieniek/blaze/math/typetraits/IsSIMDPack.h:
@@ -13594,8 +13617,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/boost/type_traits/has_left_shift.hpp:
 
-/usr/include/boost/core/swap.hpp:
-
 /data/bieniek/blaze/math/expressions/TSMatSMatSubExpr.h:
 
 /data/bieniek/blaze/util/typetraits/HasLessThan.h:
@@ -13711,8 +13732,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 /data/bieniek/blaze/math/constraints/DeclHermExpr.h:
 
 /data/bieniek/blaze/math/typetraits/IsDeclHermExpr.h:
-
-/usr/include/boost/preprocessor/arithmetic/limits/dec_256.hpp:
 
 /data/bieniek/blaze/math/constraints/DeclStrLowExpr.h:
 
@@ -14288,10 +14307,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /data/bieniek/blaze/math/expressions/DVecDVecEqualExpr.h:
 
-/data/bieniek/blaze/math/expressions/SMatDVecMultExpr.h:
-
-/usr/include/boost/config/workaround.hpp:
-
 /data/bieniek/blaze/math/expressions/DVecDVecKronExpr.h:
 
 /data/bieniek/blaze/math/expressions/DVecDVecMultExpr.h:
@@ -14477,10 +14492,6 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 /data/bieniek/blaze/math/views/elements/ElementsData.h:
 
 /usr/include/boost/type_traits/is_void.hpp:
-
-/data/bieniek/blaze/math/constraints/Diagonal.h:
-
-/usr/include/boost/array.hpp:
 
 /usr/include/boost/mpl/aux_/fold_impl.hpp:
 
@@ -14886,6 +14897,24 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/openmpi-x86_64/H5FDsec2.h:
 
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos.hpp:
+
+/data/bieniek/blaze/math/functors/Real.h:
+
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_util.hpp:
+
+/usr/include/boost/preprocessor/arithmetic/limits/dec_256.hpp:
+
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/util/linear_algebra.hpp:
+
+/data/bieniek/blaze/math/expressions/SMatDVecMultExpr.h:
+
+/usr/include/boost/config/workaround.hpp:
+
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal.hpp:
+
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal_impl.hpp:
+
 /usr/include/boost/program_options.hpp:
 
 /usr/include/bits/confname.h:
@@ -15266,6 +15295,8 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/boost/mpl/aux_/type_wrapper.hpp:
 
+/data/bieniek/lambda-lanczos/include/lambda_lanczos/util/common.hpp:
+
 /usr/include/c++/11/sstream:
 
 /data/bieniek/blaze/math/lapack/syevx.h:
@@ -15404,6 +15435,8 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 
 /usr/include/boost/numeric/conversion/udt_builtin_mixture_enum.hpp:
 
+/usr/include/c++/11/ratio:
+
 /data/bieniek/blaze/math/expressions/VecTVecMapExpr.h:
 
 /usr/include/boost/mpl/multiplies.hpp:
@@ -15423,7 +15456,3 @@ CMakeFiles/chebyshev_DOUBLE.dir/main.cpp.o: /data/bieniek/Projects/chebyshev_typ
 /data/bieniek/blaze/math/shims/Tanh.h:
 
 /usr/include/boost/detail/lcast_precision.hpp:
-
-/usr/include/boost/swap.hpp:
-
-/usr/include/boost/container/container_fwd.hpp:

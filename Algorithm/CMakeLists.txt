@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 # things to be adapted
 set(USE_TYPE DOUBLE)  # specify the type to be used (FLOAT or DOUBLE)
 include_directories(/data/bieniek)  # path to blaze
+include_directories(/data/bieniek/lambda-lanczos/include/) # path to lanczos
 #add_definitions(-DEIGEN)  # remove #, if eigen instead of lapack should be used for diagonalization
 
 

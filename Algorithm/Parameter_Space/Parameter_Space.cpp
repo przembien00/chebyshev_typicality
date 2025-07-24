@@ -117,9 +117,8 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
     Chebyshev_cutoff = vm["ChebyshevCutoff"].as<uint>();
-    dt = vm["dt"].as<RealType>();
-    num_TimePoints = static_cast<uint>( beta / dt );
-    num_TimeSteps_therm = static_cast<uint>( beta * RealType{0.5} / dt );
+    num_TimePoints = vm["numTimePoints"].as<uint>();
+    dt = beta * RealType{0.5} / static_cast<RealType>(num_TimePoints - 1);
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
     CET_rescale = vm["ChebyshevRescale"].as<RealType>();

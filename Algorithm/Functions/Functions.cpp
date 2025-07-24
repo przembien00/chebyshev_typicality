@@ -83,17 +83,17 @@ State S_z_0_act( const State& state )
     return new_state;
 }
 
-RealType CET_coeff( int n, RealType x )
+RealType CET_coeff( int n, RealType t, RealType a, RealType b )
 // Compute the nth coefficient of the Chebyshev polynomial expansion.
 {
     if( n == 0 )
     {
-        return std::cyl_bessel_i( RealType{0.0}, std::abs(x) );
+        return std::exp(b*t) * std::cyl_bessel_i( RealType{0.0}, std::abs(a*t) );
     }
     else
     {
-        RealType sign = (x>0. && n&1)? RealType{-1.0} : RealType{1.0}; // (-1)^n
-        return 2 * sign * std::cyl_bessel_i( static_cast<RealType>(n), std::abs(x) );
+        RealType sign = (a*t>0. && n&1)? RealType{-1.0} : RealType{1.0}; // (-1)^n
+        return 2 * sign * std::exp(b*t) * std::cyl_bessel_i( static_cast<RealType>(n), std::abs(a*t) );
     }
 }
 
@@ -102,14 +102,14 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth )
 // Apply e^(-tH) to the state using the Chebyshev expansion technique.
 // The state is modified in place.
 {
-    State state_final = CET_coeff( 0, H.a * t ) * state; // a_0|psi_0>
+    State state_final = CET_coeff( 0, t, H.a, H.b ) * state; // a_0|psi_0>
     State state_aux = H.act( state ); // |psi_1> = H|psi_0>
-    state_final += CET_coeff( 1, H.a * t ) * state_aux; // a_0|psi_0> + a_1|psi_1>
+    state_final += CET_coeff( 1, t, H.a, H.b ) * state_aux; // a_0|psi_0> + a_1|psi_1>
    
     for( uint n=2; n < depth + 1; n++ )
     {
         state = 2 * H.act( state_aux ) - state; // |psi_n> = 2H|psi_n-1> - |psi_n-2>
-        state_final += CET_coeff( n, H.a * t ) * state; // + a_n|psi_n> 
+        state_final += CET_coeff( n, t, H.a, H.b ) * state; // + a_n|psi_n> 
         std::swap( state, state_aux );
     }
     state = state_final;

@@ -4,7 +4,7 @@
 # compile CXX with /usr/lib64/openmpi/bin/mpicxx
 CXX_DEFINES = -DUSE_DOUBLE
 
-CXX_INCLUDES = -I/data/bieniek -I/usr/include/openmpi-x86_64
+CXX_INCLUDES = -I/data/bieniek -I/data/bieniek/lambda-lanczos/include -I/usr/include/openmpi-x86_64
 
 CXX_FLAGS = -O3 -DNDEBUG
 

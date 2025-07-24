@@ -1777,4 +1777,13 @@ CMakeFiles/chebyshev_DOUBLE.dir/Hamiltonians/Hamiltonians.cpp.o: \
  /usr/include/openmpi-x86_64/H5FDsec2.h \
  /usr/include/openmpi-x86_64/H5FDsplitter.h \
  /usr/include/openmpi-x86_64/H5FDstdio.h \
- /usr/include/openmpi-x86_64/H5VLpassthru.h
+ /usr/include/openmpi-x86_64/H5VLpassthru.h \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/eigenpair_manager.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_util.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/common.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/linear_algebra.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/util/common.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal_impl.hpp \
+ /data/bieniek/lambda-lanczos/include/lambda_lanczos/lambda_lanczos_tridiagonal_impl.hpp

@@ -4,6 +4,7 @@
 #include<blaze/Math.h>
 #include<cmath>
 #include<mpi.h>
+#include <chrono>
 
 #include"Types/Types.h"
 
