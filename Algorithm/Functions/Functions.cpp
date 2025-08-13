@@ -2,6 +2,7 @@
 #include"../Hamiltonians/Hamiltonians.h"
 #include<string>
 #include<cmath>
+#include <boost/math/special_functions/bessel.hpp>
 #include<blaze/Math.h>
 #include<random>
 #include<iostream>
@@ -47,7 +48,7 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
 // Get a state with random (Gaussian) complex coefficients. The coeffs are drawn according to a seed
 // specified in the parameter space (by deafult random).
 {
-    std::mt19937 gen{ throw_seed( seed, pspace.my_rank, sample ) };
+    std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
     State state(pspace.HilbertSpaceDimension);
     std::normal_distribution<RealType> d{0., pspace.Gauss_covariance}; 
     
@@ -67,7 +68,7 @@ State S_z_0_act( const State& state )
 {
     State new_state(state.size());
 
-    for( ulong ident = 0; ident < state.size(); ++ident )
+    for( unsigned long ident = 0; ident < state.size(); ++ident )
     {
         if( ident & 1L )
         {
@@ -88,12 +89,12 @@ RealType CET_coeff( int n, RealType t, RealType a, RealType b )
 {
     if( n == 0 )
     {
-        return std::exp(b*t) * std::cyl_bessel_i( RealType{0.0}, std::abs(a*t) );
+        return std::exp(b*t) * boost::math::cyl_bessel_i( RealType{0.0}, std::abs(a*t) );
     }
     else
     {
         RealType sign = (a*t>0. && n&1)? RealType{-1.0} : RealType{1.0}; // (-1)^n
-        return 2 * sign * std::exp(b*t) * std::cyl_bessel_i( static_cast<RealType>(n), std::abs(a*t) );
+        return 2 * sign * std::exp(b*t) * boost::math::cyl_bessel_i( static_cast<RealType>(n), std::abs(a*t) );
     }
 }
 

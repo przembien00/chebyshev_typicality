@@ -1,9 +1,12 @@
 cmake_minimum_required(VERSION 3.10)
 
+set (CMAKE_CXX_STANDARD 17)
+
+
 # things to be adapted
 set(USE_TYPE DOUBLE)  # specify the type to be used (FLOAT or DOUBLE)
-include_directories(/data/bieniek)  # path to blaze
-include_directories(/data/bieniek/lambda-lanczos/include/) # path to lanczos
+# include_directories(/data/bieniek)  # path to blaze
+include_directories(~/Projects/libs/lambda-lanczos/include/) # path to lanczos
 #add_definitions(-DEIGEN)  # remove #, if eigen instead of lapack should be used for diagonalization
 
 
@@ -28,6 +31,13 @@ find_package(HDF5 REQUIRED)
 if(HDF5_FOUND)
     include_directories(${HDF5_INCLUDE_DIRS})
     set(LINK_LIBS ${LINK_LIBS} ${HDF5_LIBRARIES})
+endif()
+
+# Find Boost
+find_package(Boost REQUIRED COMPONENTS program_options)
+if(Boost_FOUND)
+    include_directories(${Boost_INCLUDE_DIRS})
+    set(LINK_LIBS ${LINK_LIBS} ${Boost_LIBRARIES})
 endif()
 
 # Find LAPACK
@@ -69,4 +79,4 @@ set_target_properties(chebyshev_${USE_TYPE} PROPERTIES
 )
 
 # Link libraries
-target_link_libraries(chebyshev_${USE_TYPE} ${LINK_LIBS} boost_program_options)
+target_link_libraries(chebyshev_${USE_TYPE} ${LINK_LIBS})

@@ -1,0 +1,12 @@
+#do not upload data
+Data/*
+
+# do not upload Makefile
+Makefile
+
+# do not upload executables
+*executable*
+
+# do not upload build directories
+build/
+

@@ -70,7 +70,7 @@ inline bool store_string( const hid_t ID, const std::string& name, const std::st
 {
     auto space_id = H5Screate( H5S_SCALAR );
     auto datatype_id = H5Tcopy( H5T_C_S1 );
-    H5Tset_size( datatype_id, H5T_VARIABLE );
+    H5Tset_size( datatype_id, value.size() + 1 );
     auto attr_id = H5Acreate( ID, name.c_str(), datatype_id, space_id, H5P_DEFAULT, H5P_DEFAULT );
     auto status = H5Awrite( attr_id, datatype_id, &value );
     H5Aclose( attr_id );
