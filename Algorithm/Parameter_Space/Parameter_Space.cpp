@@ -85,6 +85,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "fileext", bpo::value<std::string>()->default_value(""),
     "Define an extension to the filename; it will be appended according to : filename__fileext"
+    )(
+    "numPrintDigits", bpo::value<size_t>()->default_value(size_t{4}),
+    "set the value precision for printing to the terminal"
     );
 
     description.add( description_help );
@@ -126,7 +129,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
     filename_extension = vm["fileext"].as<std::string>();
-
+    num_PrintDigits = vm["numPrintDigits"].as<size_t>();
 }
 
 void ParameterSpace::read_SpinSystem()
@@ -174,6 +177,23 @@ void ParameterSpace::read_SpinSystem()
             couplings(i,j) = linearized_data[i*num_Spins + j] * rescale;
         }
     }
+}
+
+// printing method : return the essential parameters string
+std::string ParameterSpace::create_essentials_string() const
+{   
+    size_t pre_colon_space = 35;
+    std::stringstream ss{};
+
+    ss
+    << print::quantity_to_output_line( pre_colon_space, "spin_model"     , spin_model )
+    << print::quantity_to_output_line( pre_colon_space, "num_Spins"     , std::to_string(num_Spins) )
+    << print::quantity_to_output_line( pre_colon_space, "beta"          , print::remove_zeros(print::round_value_to_string(beta,num_PrintDigits)) )
+    << print::quantity_to_output_line( pre_colon_space, "rescale"            , print::remove_zeros(print::round_value_to_string(rescale,num_PrintDigits)) )
+    << print::quantity_to_output_line( pre_colon_space, "num_TimePoints" , std::to_string(num_TimePoints) ) 
+    << print::quantity_to_output_line( pre_colon_space, "dt"       , print::remove_zeros(print::round_value_to_string(dt,num_PrintDigits)) ) 
+    << print::quantity_to_output_line( pre_colon_space, "num_Vectors"   , std::to_string(num_Vectors_Per_Core*world_size) );
+    return ss.str();
 }
 
 }

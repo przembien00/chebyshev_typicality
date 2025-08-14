@@ -2,10 +2,13 @@
 
 #include<string>
 #include"../Types/Types.h"
+#include"../cpp_libs/Print_Routines.h"
 #include<hdf5.h>
 #include<cmath>
 #include<blaze/Math.h>
 #include<random>
+
+namespace print = Print_Routines;
 
 namespace Parameter_Space
 {
@@ -49,10 +52,11 @@ class ParameterSpace
     RealType dt;
     RealType CET_rescale;
     RealType dt_therm;
+    uint num_PrintDigits;
 
     // PUBLIC METHODS
     void read_SpinSystem();
-    
+    std::string create_essentials_string() const;    
 };
 
 }
