@@ -16,7 +16,7 @@ ps::ParameterSpace my_pspace( argC, argV, world_size, my_rank );
 ham::Hamiltonian my_H( my_pspace );
 size_t seed = func::generate_seed( my_pspace, my_rank );
 print::print_R0( my_rank, my_pspace.create_essentials_string() );
-
+print::print_R0( my_rank, "================================================\n" );
 CorrTen Correlations(my_pspace.num_TimePoints);
 RealType Z = RealType{0.};
 
@@ -68,7 +68,9 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     if( k == 0 && my_rank == 0 )
     {
         end = std::chrono::steady_clock::now();
-        std::cout << "Single vector duration = " << std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count() << "[ms]" << std::endl;
+        auto duration = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
+        std::cout << "Single vector duration = " << duration << " [ms]" << std::endl;
+        std::cout << "Estimated duration of evolution = " << duration * my_pspace.num_Vectors_Per_Core / 1000  << " [s]" << std::endl;
     }
 }
 
