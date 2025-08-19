@@ -47,25 +47,25 @@ def ImportData_ED(physical_data, project_name = ""):
 N_array = np.array( [1, 3, 5, 10, 25, 50, 80, 100, 120, 150 ] )
 plt.figure(constrained_layout=True)
 
-all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=4__rescale=0.5__numVecPerCore=120")
+all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=1__rescale=0.5__numVecPerCore=150")
 G_conv = np.array( [ gab for gab in all_conv['results']['g_zz']] )
-# print(G_conv[-1])
+G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 
 sqsums = np.array([])
 
 for n in N_array:
 
-    all_1, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=4__rescale=0.5__numVecPerCore={n}")
+    all_1, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=1__rescale=0.5__numVecPerCore={n}")
 
     all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
     G_1 = np.array( [ gab for gab in all_1['results']['g_zz']] )
     # print(G_1[-1])
-    G_ed = np.array( [ gab for gab in all_ed['results'][f'4.00']['fluctuation']][0] )
+    G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
     # print(np.abs(G_1[-1]))
     G_mirror = np.concatenate((G_1,np.flip(G_1)))
     plt.plot(times_ed, G_mirror, label = rf'NumVec={4*n}')
-    sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
+    sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_conv)**2)**0.5/len(G_mirror))
 
 
 plt.plot(times_ed, G_ed, 'b--', label = rf'ED')
@@ -75,15 +75,15 @@ plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'difference')
 plt.legend()
 
-plt.savefig("Plots/Test_NumVec_beta=4.pdf")
+plt.savefig("Plots/Test_NumVec_beta=1.pdf")
 plt.clf()
 
 par, cov = curve_fit(F, 4*N_array, sqsums)
 print(par[0], cov)
 
 plt.xlabel('N')
-plt.ylabel('error conv')
+plt.ylabel('error ED')
 # plt.yscale('log')
 plt.loglog(4*N_array, sqsums, 'o')
 plt.loglog(4*N_array, F(4*N_array, par[0]))
-plt.savefig("Plots/NumVec_errors_beta=4.pdf")
+plt.savefig("Plots/NumVec_errors_beta=1.pdf")

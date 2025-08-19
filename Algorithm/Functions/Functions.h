@@ -18,7 +18,7 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
 
 State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample );
 
-State S_z_0_act( const State& state );
+State S_z_i_act( const State& state, const unsigned long site );
 
 State RK4( ham::Hamiltonian& H, State& state, const RealType dt );
 

@@ -41,7 +41,7 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [1, 2, 3, 4, 5]
+beta_array = [0.2, 0.4, 0.6, 0.8]
 
 sqsums = np.array([])
 
@@ -49,7 +49,7 @@ for beta in beta_array:
 
     all_1, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
 
-    all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
+    all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_02_08")
 
     G_1 = np.array( [ gab for gab in all_1['results']['g_zz']] )
     G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
@@ -64,8 +64,8 @@ plt.ylabel(r'$g_{xx}$($\tau$)')
 # plt.ylim(0.24, 0.26)
 plt.legend()
 
-plt.savefig("Plots/Test_lowT.pdf")
+plt.savefig("Plots/Test.pdf")
 plt.clf()
 plt.plot(beta_array, sqsums, 'o')
 plt.yscale('log')
-plt.savefig("Plots/errors_beta_lowT.pdf")
+plt.savefig("Plots/errors_beta.pdf")

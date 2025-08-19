@@ -115,23 +115,6 @@ couplings( pspace.couplings )
     b = (eigenvalue_max + eigenvalue_min) / RealType{2.};
     // b = 0;
     b_over_a = b/a;
-    // couplings = couplings / a;
-    // Initialize Hamiltonian based on couplings
-    // Find the largest abs.val. coupling J, divide by 0.5*J*z*N
-    // to make the spectrum of H fit into [-1,1] 
-    // RealType J = RealType{0.0};
-    // for( int i = 0; i < numSpins; ++i )
-    // {
-    //     for( int j = 0; j < numSpins; ++j )
-    //     {
-    //         if( std::abs(couplings(i,j)) > J )
-    //         {
-    //             J = std::abs(couplings(i,j));
-    //         }
-    //     }
-    // }
-    // a = RealType{0.25} * J * static_cast<RealType>(numSpins) * CET_rescale;
-    // std::cout << "Old bound = " << a << '\n';
     couplings = couplings / a;
 }
 

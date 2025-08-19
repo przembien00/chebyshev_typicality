@@ -63,14 +63,14 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
     return state;
 }
 
-State S_z_0_act( const State& state )
+State S_z_i_act( const State& state, const unsigned long site )
 // Act on the state with the operator S_0^z.
 {
     State new_state(state.size());
 
     for( unsigned long ident = 0; ident < state.size(); ++ident )
     {
-        if( ident & 1L )
+        if( ident >> site & 1L )
         {
             new_state[ident] = RealType{0.5} * state[ident];
         }

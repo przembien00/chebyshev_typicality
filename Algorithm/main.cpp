@@ -22,7 +22,7 @@ RealType Z = RealType{0.};
 
 // Estimate the order of expansion needed to minimize the thermalization error.
 RealType bound = my_H.a * my_pspace.beta * RealType(0.25) * std::exp(1.0);
-uint depth_beta = static_cast<uint>(bound) + 20;
+uint depth_beta = static_cast<uint>(bound) + 15;
 std::stringstream ss;
 ss << "Thermalization error = " << std::pow( bound/static_cast<RealType>(depth_beta), static_cast<RealType>(depth_beta) ) << '\n';
 // Estimate the order of expansion needed to minimize the evolution error.
@@ -54,8 +54,8 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 
     // Evolve: loop over times
 
-    State psi_R = func::S_z_0_act( psi_L ); // S^z_0 e^(-beta*H/2)|psi_0>
-    Correlations[0] += func::cdot( psi_L, func::S_z_0_act( psi_R ) );
+    State psi_R = func::S_z_i_act( psi_L, 0 ); // S^z_0 e^(-beta*H/2)|psi_0>
+    Correlations[0] += func::cdot( psi_L, func::S_z_i_act( psi_R, 0 ) );
 
     for( uint i = 1; i < my_pspace.num_TimePoints; i++ )
     {
@@ -63,7 +63,7 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
         // psi_L = func::RK4( my_H, psi_L, my_pspace.dt );
         func::CET( my_H, psi_R, my_pspace.dt, depth_dt ); // e^(-tau H) S^z_0 e^(-beta H/2)|psi_0>
         func::CET( my_H, psi_L, - my_pspace.dt, depth_dt ); // e^(tau H) e^(-beta H/2)|psi_0>
-        Correlations[i] += func::cdot( psi_L, func::S_z_0_act(psi_R) ); // <psi_0|e^(-beta H/2) e^(tau H) S^z_0 e^(-tau H) S^z_0 e^(-beta H/2)|psi_0>
+        Correlations[i] += func::cdot( psi_L, func::S_z_i_act(psi_R, 0) ); // <psi_0|e^(-beta H/2) e^(tau H) S^z_0 e^(-tau H) S^z_0 e^(-beta H/2)|psi_0>
     }
     if( k == 0 && my_rank == 0 )
     {
@@ -82,5 +82,7 @@ stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
 my_data_storage.store_main( my_pspace, Correlations );
 my_data_storage.finalize();
 MPI_Finalize();
+print::print_R0( my_rank, "================================================\n" );
+
 
 }
