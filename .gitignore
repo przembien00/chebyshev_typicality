@@ -1,5 +1,4 @@
-#do not upload data
-Data/*
+
 
 # do not upload Makefile
 Makefile
@@ -10,3 +9,5 @@ Makefile
 # do not upload build directories
 build/
 
+# do not upload data CMakeLists
+CMakeLists.txt
