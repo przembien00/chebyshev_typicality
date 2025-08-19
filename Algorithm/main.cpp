@@ -4,6 +4,8 @@
 
 int main( const int argC, char* const argV[] )
 {
+
+
 // ====== Initialize MPI ======
 // world_size is the number of cores, my_rank is the number of "this" core 
 int world_size, my_rank;
@@ -11,28 +13,34 @@ MPI_Init( nullptr, nullptr );
 MPI_Comm_size( MPI_COMM_WORLD, &world_size );
 MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
 
+// tm::clock my_clock( my_rank, world_size );
+
+
 // Initialize
 ps::ParameterSpace my_pspace( argC, argV, world_size, my_rank );
 ham::Hamiltonian my_H( my_pspace );
 size_t seed = func::generate_seed( my_pspace, my_rank );
 print::print_R0( my_rank, my_pspace.create_essentials_string() );
-print::print_R0( my_rank, "================================================\n" );
+print::print_R0( my_rank, "++++++++++++++++++++++++++++++++++++++++++++++++\n" );
 CorrTen Correlations(my_pspace.num_TimePoints);
 RealType Z = RealType{0.};
 
+auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
+
+print::print_R0( my_rank, "Chebyshev expansion depth for thermalization = " + std::to_string(depth_beta) + "\n" );
+print::print_R0( my_rank, "Chebyshev expansion depth for time evolution = " + std::to_string(depth_dt) + "\n" );
+
 // Estimate the order of expansion needed to minimize the thermalization error.
 RealType bound = my_H.a * my_pspace.beta * RealType(0.25) * std::exp(1.0);
-uint depth_beta = static_cast<uint>(bound) + 15;
 std::stringstream ss;
 ss << "Thermalization error = " << std::pow( bound/static_cast<RealType>(depth_beta), static_cast<RealType>(depth_beta) ) << '\n';
 // Estimate the order of expansion needed to minimize the evolution error.
 bound = my_H.a * my_pspace.dt * RealType(0.5) * std::exp(1.0);
-uint depth_dt = static_cast<uint>(bound) + my_pspace.Chebyshev_cutoff;
 ss.clear();
 ss << "Time evolution error = " << std::pow( bound/static_cast<RealType>(depth_dt), static_cast<RealType>(depth_dt) ) << '\n';
 print::print_R0( my_rank, ss.str() );
-std::chrono::steady_clock::time_point begin;
-std::chrono::steady_clock::time_point end;
+
+std::chrono::steady_clock::time_point begin, end;
 
 for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 {
@@ -82,7 +90,7 @@ stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
 my_data_storage.store_main( my_pspace, Correlations );
 my_data_storage.finalize();
 MPI_Finalize();
-print::print_R0( my_rank, "================================================\n" );
+print::print_R0( my_rank, "++++++++++++++++++++++++++++++++++++++++++++++++\n" );
 
 
 }

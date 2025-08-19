@@ -43,7 +43,8 @@ class ParameterSpace
     RealType rescale;
 
     // Numerical parameters
-    uint Chebyshev_cutoff;
+    RealType CET_therm_error; // Error threshold for thermalization
+    RealType CET_evol_error; // Error threshold
     std::string seed;
     uint num_TimePoints;
     uint num_TimeSteps_therm;

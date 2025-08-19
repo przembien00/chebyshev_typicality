@@ -3,6 +3,7 @@
 #include<string>
 #include<cmath>
 #include <boost/math/special_functions/bessel.hpp>
+#include <boost/math/special_functions/lambert_w.hpp>
 #include<blaze/Math.h>
 #include<random>
 #include<iostream>
@@ -82,6 +83,16 @@ State S_z_i_act( const State& state, const unsigned long site )
     }
 
     return new_state;
+}
+
+std::tuple<uint, uint> determine_CET_depth( const ham::Hamiltonian& H, const ps::ParameterSpace& pspace )
+// Determine the depth of the Chebyshev expansion needed to minimize the thermalization and evolution errors
+{
+    RealType factor_therm = H.a * pspace.beta * RealType{0.25} * std::exp(1.0);
+    RealType factor_evol = H.a * pspace.dt * RealType{0.5} * std::exp(1.0);
+    return std::make_tuple(
+        static_cast<uint>(std::ceil( - std::log( pspace.CET_therm_error ) / boost::math::lambert_w0( - std::log( pspace.CET_therm_error ) / factor_therm ) ) ),
+        static_cast<uint>(std::ceil( - std::log( pspace.CET_evol_error ) / boost::math::lambert_w0( - std::log( pspace.CET_evol_error ) / factor_evol ) ) ) ); 
 }
 
 RealType CET_coeff( int n, RealType t, RealType a, RealType b )

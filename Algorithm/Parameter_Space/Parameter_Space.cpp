@@ -58,9 +58,6 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "seed", bpo::value<std::string>()->default_value("random"),
     "set the seed for drawing the states"
     )(
-    "ChebyshevCutoff", bpo::value<uint>()->default_value(uint{3}),
-    "set the cutoff order for Chebyshev expansion in time evolution"
-    )(
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
     "set the number of time points for the equidistant time discretization"
     )(
@@ -75,6 +72,12 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "dt", bpo::value<RealType>()->default_value(RealType{0.05}),
     "set the timestep, RK4 error scales like dt^5"
+    )(
+    "CET_therm_error", bpo::value<RealType>()->default_value(RealType{1e-10}),
+    "set the error threshold for thermalization, used to determine the Chebyshev expansion depth"
+    )(
+    "CET_evol_error", bpo::value<RealType>()->default_value(RealType{1e-7}),
+    "set the error threshold for time evolution, used to determine the Chebyshev expansion depth"
     );
 
     // ========== storing and naming ==========
@@ -119,7 +122,8 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
-    Chebyshev_cutoff = vm["ChebyshevCutoff"].as<uint>();
+    CET_therm_error = vm["CET_therm_error"].as<RealType>();
+    CET_evol_error = vm["CET_evol_error"].as<RealType>();
     num_TimePoints = vm["numTimePoints"].as<uint>();
     dt = beta * RealType{0.5} / static_cast<RealType>(num_TimePoints - 1);
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
