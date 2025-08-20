@@ -64,10 +64,10 @@ void Simple_Estimator::estimate( const int iteration )
         auto estimated_duration = duration * num_iterations / 1000; // in seconds
         print::print_R0(my_rank, "Single iteration duration: " + std::to_string(duration) + " ms\n");
         print::print_R0(my_rank,"Estimated duration of " + task_name + ": " + std::to_string(estimated_duration) + " s\n");
-        print::print_R0(my_rank, "------------- Progress of " + task_name + " -------------\n");
+        print::print_R0(my_rank, "---------- \033[1mProgress of " + task_name + "\033[0m ----------\n");
     }
     RealType progress = static_cast<RealType>(iteration + 1) / static_cast<RealType>(num_iterations);
-    int bar_width = 50; // Width of the progress bar
+    int bar_width = 46; // Width of the progress bar
     print::print_R0(my_rank, "\r[");
     int filled = static_cast<int>(bar_width * progress);
     for (int i = 0; i < filled; ++i)
@@ -84,7 +84,7 @@ void Simple_Estimator::estimate( const int iteration )
 
 void Simple_Estimator::leave_loop()
 {
-    print::print_R0(my_rank, "\n");
+    print::print_R0(my_rank, "\n-----------------------------------------------------\n");
 }
 
 }
