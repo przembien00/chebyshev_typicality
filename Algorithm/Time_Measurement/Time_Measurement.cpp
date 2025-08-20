@@ -23,12 +23,12 @@ void Clock::measure( const std::string& task )
     if( duration < 1 )
     {
         duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_measurement).count();
-        print::print_R0(my_rank,"\033[1m" + task + " done, took " + std::to_string(duration) + " ms\033[0m\n");
+        print::print_R0(my_rank,"\033[1;36m" + task + " done, took " + std::to_string(duration) + " ms\033[0m\n");
         last_measurement = now;
         return;
     }
     last_measurement = now;
-    print::print_R0(my_rank, "\033[1m" + task + " done, took " + std::to_string(duration) + " s\033[0m\n");
+    print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(duration) + " s\033[0m\n");
 }
 
 void Clock::finalize()
