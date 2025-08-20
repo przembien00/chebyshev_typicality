@@ -38,12 +38,6 @@ if(Boost_FOUND)
     set(LINK_LIBS ${LINK_LIBS} ${Boost_LIBRARIES})
 endif()
 
-# Find LAPACK
-# find_package(LAPACK REQUIRED)
-# if(LAPACK_FOUND)
-#     set(LINK_LIBS ${LINK_LIBS} ${LAPACK_LIBRARIES})
-# endif()
-
 # Add definitions
 add_definitions(-DUSE_${USE_TYPE})
 

@@ -1,7 +1,6 @@
 #include<iostream>
 #include<vector>
 #include<string>
-#include<format>
 #include<blaze/Math.h>
 #include<cmath>
 #include<mpi.h>
