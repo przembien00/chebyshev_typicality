@@ -76,7 +76,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "CET_therm_error", bpo::value<RealType>()->default_value(RealType{1e-10}),
     "set the error threshold for thermalization, used to determine the Chebyshev expansion depth"
     )(
-    "CET_evol_error", bpo::value<RealType>()->default_value(RealType{1e-7}),
+    "CET_evol_error", bpo::value<RealType>()->default_value(RealType{1e-6}),
     "set the error threshold for time evolution, used to determine the Chebyshev expansion depth"
     );
 

@@ -13,49 +13,28 @@ MPI_Init( nullptr, nullptr );
 MPI_Comm_size( MPI_COMM_WORLD, &world_size );
 MPI_Comm_rank( MPI_COMM_WORLD, &my_rank );
 
-// tm::clock my_clock( my_rank, world_size );
-
+tmm::Clock my_clock( my_rank );
 
 // Initialize
 ps::ParameterSpace my_pspace( argC, argV, world_size, my_rank );
 ham::Hamiltonian my_H( my_pspace );
 size_t seed = func::generate_seed( my_pspace, my_rank );
 print::print_R0( my_rank, my_pspace.create_essentials_string() );
-print::print_R0( my_rank, "++++++++++++++++++++++++++++++++++++++++++++++++\n" );
+print::print_R0( my_rank, "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n" );
 CorrTen Correlations(my_pspace.num_TimePoints);
 RealType Z = RealType{0.};
 
 auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
 
-print::print_R0( my_rank, "Chebyshev expansion depth for thermalization = " + std::to_string(depth_beta) + "\n" );
-print::print_R0( my_rank, "Chebyshev expansion depth for time evolution = " + std::to_string(depth_dt) + "\n" );
+my_clock.measure("Initialization");
 
-// Estimate the order of expansion needed to minimize the thermalization error.
-RealType bound = my_H.a * my_pspace.beta * RealType(0.25) * std::exp(1.0);
-std::stringstream ss;
-ss << "Thermalization error = " << std::pow( bound/static_cast<RealType>(depth_beta), static_cast<RealType>(depth_beta) ) << '\n';
-// Estimate the order of expansion needed to minimize the evolution error.
-bound = my_H.a * my_pspace.dt * RealType(0.5) * std::exp(1.0);
-ss.clear();
-ss << "Time evolution error = " << std::pow( bound/static_cast<RealType>(depth_dt), static_cast<RealType>(depth_dt) ) << '\n';
-print::print_R0( my_rank, ss.str() );
+tmm::Simple_Estimator my_estimator( my_rank, my_pspace.num_Vectors_Per_Core, "typicality sampling" );
 
-std::chrono::steady_clock::time_point begin, end;
-
+my_estimator.enter_loop();
+// ====== Main loop ======
 for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 {
-    if( k == 0 && my_rank == 0 )
-    {
-        begin = std::chrono::steady_clock::now();
-    }
     State psi_L = func::initialize_state( my_pspace, seed, k ); // |psi_0>
-
-
-    // Thermalize. Compute Z.
-    // for( uint i=1; i < my_pspace.num_TimeSteps_therm; i++ )
-    // {
-    //     psi_L = func::RK4( my_H, psi_L, - my_pspace.dt );
-    // }
 
     func::CET( my_H, psi_L, my_pspace.beta * RealType{0.5}, depth_beta ); // e^(-beta*H/2)|psi_0>
     Z += std::pow( std::real(blaze::norm(psi_L)) , 2 ); // Z = <psi_0|e^(-beta*H)|psi_0>
@@ -73,24 +52,22 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
         func::CET( my_H, psi_L, - my_pspace.dt, depth_dt ); // e^(tau H) e^(-beta H/2)|psi_0>
         Correlations[i] += func::cdot( psi_L, func::S_z_i_act(psi_R, 0) ); // <psi_0|e^(-beta H/2) e^(tau H) S^z_0 e^(-tau H) S^z_0 e^(-beta H/2)|psi_0>
     }
-    if( k == 0 && my_rank == 0 )
-    {
-        end = std::chrono::steady_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::milliseconds> (end - begin).count();
-        std::cout << "Single vector duration = " << duration << " [ms]" << std::endl;
-        std::cout << "Estimated duration of evolution = " << duration * my_pspace.num_Vectors_Per_Core / 1000  << " [s]" << std::endl;
-    }
+    my_estimator.estimate(k);
 }
+my_estimator.leave_loop();
 
 func::MPI_share_results( Z, Correlations );
 func::normalize( Z, Correlations );
+my_clock.measure("Correlations");
 
 // Store correlations
 stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
 my_data_storage.store_main( my_pspace, Correlations );
 my_data_storage.finalize();
+my_clock.measure("Saving");
+my_clock.finalize();
 MPI_Finalize();
-print::print_R0( my_rank, "++++++++++++++++++++++++++++++++++++++++++++++++\n" );
+print::print_R0( my_rank, "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n" );
 
 
 }

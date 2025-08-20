@@ -5,10 +5,8 @@ set (CMAKE_CXX_STANDARD 20)
 
 # things to be adapted
 set(USE_TYPE DOUBLE)  # specify the type to be used (FLOAT or DOUBLE)
-# include_directories(/data/bieniek)  # path to blaze
-include_directories(~/Projects/libs/lambda-lanczos/include/) # path to lanczos
-#add_definitions(-DEIGEN)  # remove #, if eigen instead of lapack should be used for diagonalization
-
+# include_directories(/path/to/blaze)  # path to blaze
+include_directories(/path/to/lambda-lanczos/) # path to lambda-lanczos
 
 # Project name
 project(chebyshev_typicality)
@@ -56,6 +54,7 @@ set(SOURCES
     Parameter_Space/Parameter_Space.cpp
     Hamiltonians/Hamiltonians.cpp
     Storage_Concept/Storage_Concept.cpp
+    Time_Measurement/Time_Measurement.cpp
 )
 
 
@@ -66,6 +65,8 @@ set(GLOB_RECURSE HEADERS
     "Parameter_Space/*.h"
     "Functions/*.h"
     "Storage_Concept/*.h"
+    "Time_Measurement/*.h"
+    "Hamiltonians/*.h"
     "cpp_libs/*.h"
 )
 
