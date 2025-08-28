@@ -9,5 +9,8 @@ Makefile
 # do not upload build directories
 build/
 
+# do not upload plots
+Plots/
+
 # do not upload data CMakeLists
 CMakeLists.txt
