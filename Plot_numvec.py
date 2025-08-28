@@ -47,7 +47,7 @@ def ImportData_ED(physical_data, project_name = ""):
 N_array = np.array( [1, 3, 5, 10, 25, 50, 80, 100, 120, 150 ] )
 plt.figure(constrained_layout=True)
 
-all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
+all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=18__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
 G_conv = np.array( [ gab for gab in all_conv['results']['g_zz']] )
 G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 
@@ -55,7 +55,7 @@ sqsums = np.array([])
 
 for n in N_array:
 
-    all_1, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=16__beta=1__rescale=0.5__numVecPerCore={n}")
+    all_1, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N=18__beta=1__rescale=0.5__numVecPerCore={n}")
 
     all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
@@ -82,7 +82,7 @@ par, cov = curve_fit(F, 4*N_array, sqsums)
 print(par[0], cov)
 
 plt.xlabel('N')
-plt.ylabel('error ED')
+plt.ylabel('error conv')
 # plt.yscale('log')
 plt.loglog(4*N_array, sqsums, 'o')
 plt.loglog(4*N_array, F(4*N_array, par[0]))
