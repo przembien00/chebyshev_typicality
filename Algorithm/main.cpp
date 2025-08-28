@@ -17,10 +17,10 @@ tmm::Clock my_clock( my_rank );
 
 // Initialize
 ps::ParameterSpace my_pspace( argC, argV, world_size, my_rank );
-ham::Hamiltonian my_H( my_pspace );
-size_t seed = func::generate_seed( my_pspace, my_rank );
 print::print_R0( my_rank, my_pspace.create_essentials_string() );
 print::print_R0( my_rank, "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n" );
+ham::Hamiltonian my_H( my_pspace );
+size_t seed = func::generate_seed( my_pspace, my_rank );
 CorrTen Correlations(my_pspace.num_TimePoints);
 RealType Z = RealType{0.};
 
