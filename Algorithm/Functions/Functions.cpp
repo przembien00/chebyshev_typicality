@@ -14,10 +14,10 @@ namespace ham = Hamiltonians;
 namespace Functions
 {
 
-RealType cdot( const State& state1, const State& state2 )
+ComplexType cdot( const State& state1, const State& state2 )
 // Complex scalar product of two states
 {
-    return std::real(blaze::dot( blaze::conj(state1), state2 ));
+    return blaze::dot( blaze::conj(state1), state2 );
 }
 
 size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank )
@@ -44,15 +44,24 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
     return (size_t) std::abs( static_cast<int>(seed) - static_cast<int>((sample + pow(10,5)) * (my_rank+1)) );
 }
 
+States initialize_states( const ps::ParameterSpace& pspace, uint seed, uint sample )
+{
+    std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
+    std::normal_distribution<RealType> d{0., pspace.Gauss_covariance};
+    
+    // cases for symmetry types
 
-State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample )
+    // Loop over number of states
+    State state = draw_state(d, gen);
+    
+
+}
+
+State draw_state( std::normal_distribution<RealType> d, std::mt19937 gen )
 // Get a state with random (Gaussian) complex coefficients. The coeffs are drawn according to a seed
 // specified in the parameter space (by deafult random).
 {
-    std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
     State state(pspace.HilbertSpaceDimension);
-    std::normal_distribution<RealType> d{0., pspace.Gauss_covariance}; 
-    
     for( uint i = 0; i < state.size(); ++i )
     {
         RealType a = d(gen);
@@ -64,12 +73,36 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
     return state;
 }
 
-State S_z_i_act( const State& state, const unsigned long site )
-// Act on the state with the operator S_0^z.
+State S_alpha_i_act( const State& state, const long site, char alpha )
+// Act on the state with the operator S_i^alpha, alpha=x,y,z.
 {
     State new_state(state.size());
-
-    for( unsigned long ident = 0; ident < state.size(); ++ident )
+    if( alpha == 'x' )
+    {
+    for( long ident = 0; ident < state.size(); ++ident )
+    {
+        long new_ident = ident ^ ( 1L << site );
+        new_state[new_ident] += RealType{0.5} * state[ident];
+    }   
+    }
+    else if( alpha == 'y' )
+    {
+    for( long ident = 0; ident < state.size(); ++ident )
+    {
+        long new_ident = ident ^ ( 1L << site );
+        if( ident >> site & 1L )
+        {
+            new_state[new_ident] += ComplexType{0.,0.5} * state[ident]; // -1/(2i)
+        }
+        else
+        {
+            new_state[new_ident] += - ComplexType{0.,0.5} * state[ident]; // 1/(2i)
+        }
+    }   
+    }
+    else if( alpha == 'z' )
+    {
+    for( long ident = 0; ident < state.size(); ++ident )
     {
         if( ident >> site & 1L )
         {
@@ -81,7 +114,7 @@ State S_z_i_act( const State& state, const unsigned long site )
         }
 
     }
-
+    }
     return new_state;
 }
 

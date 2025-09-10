@@ -57,6 +57,10 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
     filename += "__" + pspace.couplings_filename;
     std::stringstream params_stream;
     params_stream << "__beta=" << pspace.beta;
+    if( pspace.h_z != RealType{0.} )
+    {
+        params_stream << "__h_z=" << pspace.h_z;
+    }
     if( pspace.rescale != RealType{1.} )
     {
         params_stream << "__rescale=" << pspace.rescale;
@@ -116,6 +120,7 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrTen& 
     //hdf5r::add_char_to_group( ps_group_id, "correlation_symmetry_type",    pspace.spin_model.m_correlations._symmetry_type );
 
     hdf5r::store_scalar( ps_group_id, "beta", pspace.beta );
+    hdf5r::store_scalar( ps_group_id, "h_z", pspace.h_z );
     hdf5r::store_scalar( ps_group_id, "num_TimePoints",               pspace.num_TimePoints ); 
     hdf5r::store_scalar( ps_group_id, "delta_t",                  pspace.dt );
 

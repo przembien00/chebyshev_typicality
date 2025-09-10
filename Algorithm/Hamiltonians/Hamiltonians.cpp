@@ -51,10 +51,70 @@ State act_ISO( const State& state, const Hamiltonian& H )
 
             }
         }
+
+
     }
 
     return new_state;
 }
+
+State act_ISO_h( const State& state, const Hamiltonian& H )
+// Apply the Isotropic Heisenberg Hamiltonian to the state vector.
+{   
+    State new_state = - H.b_over_a * state; // shift to make the spectrum symmetrical
+
+    for( long i = 0; i < H.numSpins; ++i )
+    {
+        for( long j = i; j < H.numSpins; ++j )
+        {
+            RealType J = H.couplings(i,j);
+            if( J == RealType{0.0} ) continue; // skip zero couplings
+
+            for( long ident = 0; ident < H.dim; ++ident )
+            {
+                // Apply the Hamiltonian term to the state
+
+                // S_i^z * S_j^z
+
+                if( ( ( ident >> i ) & 1L) == ( (ident >> j)  & 1L ) ) // check if the spins on sites i, j are in the same direction
+                {
+                    new_state[ident] += RealType{0.25} * J * state[ident];
+                }
+                else
+                {
+                    new_state[ident] += - RealType{0.25} * J * state[ident];
+                }
+
+                // 0.5 * ( S_i^+ * S_j^- + S_i^- * S_j^+ )
+
+                if( ( ( ident >> i ) & 1L) ^ ( (ident >> j)  & 1L ) )
+                {
+                    long new_ident = ( ident ^ ( 1L << j ) ) ^ ( 1L << i );
+                    new_state[new_ident] += RealType{0.5} * J * state[ident];
+                }
+                
+                // h^z * S_i^z
+
+                if( j == i )
+                {
+                    if( ident >> i & 1L )
+                    {
+                        new_state[ident] = RealType{0.5} * H.params.h_z * state[ident];
+                    }
+                    else
+                    {
+                        new_state[ident] = - RealType{0.5} * H.params.h_z * state[ident];
+                    }
+                }
+            }
+        }
+
+
+    }
+
+    return new_state;
+}
+
 
 // Vector initializer for Lanczos
 template <typename T>
@@ -77,13 +137,20 @@ CET_rescale( pspace.CET_rescale ),
 dim( pspace.HilbertSpaceDimension ),
 couplings( pspace.couplings )
 {
-    
+    std::string spin_model = pspace.spin_model;
+    if( pspace.h_z != RealType{0.} )
+    {
+        spin_model += "_h";
+        params.h_z = pspace.h_z;
+    }
+
     // Define a mapping from models to actions of the Hamiltonian
     std::map< std::string, std::function< State( const State&, const Hamiltonian& ) > > model_map{
         {"ISO", act_ISO},
+        {"ISO_h", act_ISO_h}
     };
     // Define the action of the Hamiltonian based on the model.
-    act = [model_map, model = pspace.spin_model, this](const State& state){
+    act = [model_map, model = spin_model, this](const State& state){
         return model_map.at(model)(state, *this);};
 
     // Find the smallest and largest eigenvalue for the rescaling
@@ -113,7 +180,6 @@ couplings( pspace.couplings )
     engine_min.run(eigenvalue_min, eigenvector_min);
     a = (eigenvalue_max - eigenvalue_min) / RealType{2.};
     b = (eigenvalue_max + eigenvalue_min) / RealType{2.};
-    // b = 0;
     b_over_a = b/a;
     couplings = couplings / a;
 }

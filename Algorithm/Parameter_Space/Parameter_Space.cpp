@@ -50,6 +50,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "rescale", bpo::value<RealType>()->default_value(RealType{1.0}),
     "the factor rescale is multiplied to the couplings (for example for them to be in units of JQ)"
+    )(
+    "h_z", bpo::value<RealType>()->default_value(RealType{0.}),
+    "set the value of the magnetic field in the z direction"
     );
 
     // ========== general numerical parameters ==========
@@ -119,6 +122,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     HilbertSpaceDimension = 1 << num_Spins; // 2^num_Spins
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
+    h_z = vm["h_z"].as<RealType>();
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
@@ -193,10 +197,12 @@ std::string ParameterSpace::create_essentials_string() const
     << print::quantity_to_output_line( pre_colon_space, "spin_model"     , spin_model )
     << print::quantity_to_output_line( pre_colon_space, "num_Spins"     , std::to_string(num_Spins) )
     << print::quantity_to_output_line( pre_colon_space, "beta"          , print::remove_zeros(print::round_value_to_string(beta,num_PrintDigits)) )
+    << print::quantity_to_output_line( pre_colon_space, "h_z"          , print::remove_zeros(print::round_value_to_string(h_z,num_PrintDigits)) )
     << print::quantity_to_output_line( pre_colon_space, "rescale"            , print::remove_zeros(print::round_value_to_string(rescale,num_PrintDigits)) )
     << print::quantity_to_output_line( pre_colon_space, "num_TimePoints" , std::to_string(num_TimePoints) ) 
     << print::quantity_to_output_line( pre_colon_space, "dt"       , print::remove_zeros(print::round_value_to_string(dt,num_PrintDigits)) ) 
     << print::quantity_to_output_line( pre_colon_space, "num_Vectors"   , std::to_string(num_Vectors_Per_Core*world_size) );
+    
     return ss.str();
 }
 

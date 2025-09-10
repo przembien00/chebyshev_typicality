@@ -41,6 +41,7 @@ class ParameterSpace
     std::string spin_model;
     RealType beta; // Inverse temperature
     RealType rescale;
+    RealType h_z;
 
     // Numerical parameters
     RealType CET_therm_error; // Error threshold for thermalization

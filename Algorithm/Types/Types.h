@@ -24,9 +24,12 @@ typedef std::complex<RealType> ComplexType;
 // STATE
 
 typedef blaze::DynamicVector<ComplexType> State;
+typedef std::vector<State> States;
 
 // SYSTEM COUPLINGS
 
 typedef blaze::SymmetricMatrix<blaze::DynamicMatrix<RealType,blaze::rowMajor>> CouplingMatrix;
 
-typedef std::vector<RealType> CorrTen;
+// CORRELATION
+
+typedef std::vector<ComplexType> Correlation;

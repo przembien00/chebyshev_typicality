@@ -7,6 +7,8 @@
 #include<chrono>
 
 #include"Types/Types.h"
+#include"Types/Tensors.h"
+using CorrelationTensor = Observables::Tensors::CorrelationTensor<CorrelationVector>;
 
 #include"cpp_libs/Print_Routines.h"
 namespace print = Print_Routines;
