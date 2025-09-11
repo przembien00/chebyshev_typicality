@@ -42,6 +42,7 @@ class ParameterSpace
     RealType beta; // Inverse temperature
     RealType rescale;
     RealType h_z;
+    char symmetry_type;
 
     // Numerical parameters
     RealType CET_therm_error; // Error threshold for thermalization

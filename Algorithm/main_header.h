@@ -5,10 +5,12 @@
 #include<cmath>
 #include<mpi.h>
 #include<chrono>
+#include<algorithm>
 
 #include"Types/Types.h"
+#include"Types/Correlations.h"
 #include"Types/Tensors.h"
-using CorrelationTensor = Observables::Tensors::CorrelationTensor<CorrelationVector>;
+using CorrelationTensor = Tensors::CorrelationTensor<Correlations::CorrelationVector>;
 
 #include"cpp_libs/Print_Routines.h"
 namespace print = Print_Routines;

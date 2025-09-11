@@ -7,7 +7,7 @@
 #include<type_traits>
 #include"../cpp_libs/O_Error_Handling.h"
 
-namespace Observables::Tensors
+namespace Tensors
 {
 
 // ================== NAMESPACES ========================
@@ -455,7 +455,7 @@ Correlation& CorrelationTensor<Correlation>::operator()( const uint a, const uin
         else if( b == 1 ){  return get_zy(); }
         else{               return get_zz(); }
     }
-    return Correlation(); // suppress compiler warnings
+    //return Correlation(); // suppress compiler warnings
 }
 
 template<typename Correlation>

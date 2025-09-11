@@ -29,7 +29,3 @@ typedef std::vector<State> States;
 // SYSTEM COUPLINGS
 
 typedef blaze::SymmetricMatrix<blaze::DynamicMatrix<RealType,blaze::rowMajor>> CouplingMatrix;
-
-// CORRELATION
-
-typedef std::vector<ComplexType> Correlation;

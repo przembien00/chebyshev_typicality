@@ -1,4 +1,6 @@
 #include"../Types/Types.h"
+#include"../Types/Tensors.h"
+#include"../Types/Correlations.h"
 #include"../Hamiltonians/Hamiltonians.h"
 #include<string>
 #include<cmath>
@@ -8,16 +10,20 @@
 #include<random>
 #include<iostream>
 
+
+
 namespace ps = Parameter_Space;
 namespace ham = Hamiltonians;
 
 namespace Functions
 {
+using CorrelationTensor = Tensors::CorrelationTensor<Correlations::CorrelationVector>;
+using CorrelationVector = Correlations::CorrelationVector;
 
-ComplexType cdot( const State& state1, const State& state2 )
+RealType cdot( const State& state1, const State& state2 )
 // Complex scalar product of two states
 {
-    return blaze::dot( blaze::conj(state1), state2 );
+    return std::real(blaze::dot( blaze::conj(state1), state2 ));
 }
 
 size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank )
@@ -44,23 +50,10 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
     return (size_t) std::abs( static_cast<int>(seed) - static_cast<int>((sample + pow(10,5)) * (my_rank+1)) );
 }
 
-States initialize_states( const ps::ParameterSpace& pspace, uint seed, uint sample )
+State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample )
 {
     std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
     std::normal_distribution<RealType> d{0., pspace.Gauss_covariance};
-    
-    // cases for symmetry types
-
-    // Loop over number of states
-    State state = draw_state(d, gen);
-    
-
-}
-
-State draw_state( std::normal_distribution<RealType> d, std::mt19937 gen )
-// Get a state with random (Gaussian) complex coefficients. The coeffs are drawn according to a seed
-// specified in the parameter space (by deafult random).
-{
     State state(pspace.HilbertSpaceDimension);
     for( uint i = 0; i < state.size(); ++i )
     {
@@ -77,46 +70,126 @@ State S_alpha_i_act( const State& state, const long site, char alpha )
 // Act on the state with the operator S_i^alpha, alpha=x,y,z.
 {
     State new_state(state.size());
-    if( alpha == 'x' )
+    switch( alpha )
     {
-    for( long ident = 0; ident < state.size(); ++ident )
-    {
-        long new_ident = ident ^ ( 1L << site );
-        new_state[new_ident] += RealType{0.5} * state[ident];
-    }   
-    }
-    else if( alpha == 'y' )
-    {
-    for( long ident = 0; ident < state.size(); ++ident )
-    {
-        long new_ident = ident ^ ( 1L << site );
-        if( ident >> site & 1L )
+        case 'x':
         {
-            new_state[new_ident] += ComplexType{0.,0.5} * state[ident]; // -1/(2i)
+            for( long ident = 0; ident < state.size(); ++ident )
+            {
+                long new_ident = ident ^ ( 1L << site );
+                new_state[new_ident] += RealType{0.5} * state[ident];
+            }
+            return new_state;
         }
-        else
+        case 'y':
         {
-            new_state[new_ident] += - ComplexType{0.,0.5} * state[ident]; // 1/(2i)
+            for( long ident = 0; ident < state.size(); ++ident )
+            {
+                long new_ident = ident ^ ( 1L << site );
+                if( ident >> site & 1L )
+                {
+                    new_state[new_ident] += ComplexType{0.,0.5} * state[ident]; // -1/(2i)
+                }
+                else
+                {
+                    new_state[new_ident] += - ComplexType{0.,0.5} * state[ident]; // 1/(2i)
+                }
+            }
+            return new_state;
         }
-    }   
-    }
-    else if( alpha == 'z' )
-    {
-    for( long ident = 0; ident < state.size(); ++ident )
-    {
-        if( ident >> site & 1L )
+        case 'z':
         {
-            new_state[ident] = RealType{0.5} * state[ident];
+            for( long ident = 0; ident < state.size(); ++ident )
+            {
+                if( ident >> site & 1L )
+                {
+                    new_state[ident] = RealType{0.5} * state[ident];
+                }
+                else
+                {
+                    new_state[ident] = - RealType{0.5} * state[ident];
+                }
+            }
+            return new_state;
         }
-        else
-        {
-            new_state[ident] = - RealType{0.5} * state[ident];
-        }
-
     }
-    }
-    return new_state;
 }
+
+void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs )
+{
+    switch( pspace.symmetry_type )
+    {
+        case 'A':
+        {
+            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
+            break;
+        }
+        case 'B':
+        {
+            std::cout<< "B\n";
+            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
+            break;
+        }
+        case 'C':
+        {
+            std::cout<< "C\n";
+            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs(1,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
+            corrs(0,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
+            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            break;
+        }
+        case 'D':
+        {
+            std::cout<< "D\n";
+            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs(0,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
+            corrs(0,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'x' ) );
+            corrs(1,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
+            corrs(1,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'y' ) );
+            corrs(1,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'y' ) );
+            corrs(2,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
+            corrs(2,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
+            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            break;
+        }
+    }
+}
+
+States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site )
+{
+    States states;
+    switch( pspace.symmetry_type )
+    {
+        case 'A':
+        {
+            states.emplace_back(S_alpha_i_act(state,site,'z'));     
+            return states;
+        }
+        case 'B':
+        {
+            states.emplace_back(S_alpha_i_act(state,site,'x'));
+            states.emplace_back(S_alpha_i_act(state,site,'z'));
+            return states;
+        }
+        case 'C':
+        {
+            states.emplace_back(S_alpha_i_act(state,site,'x'));
+            states.emplace_back(S_alpha_i_act(state,site,'y'));
+            states.emplace_back(S_alpha_i_act(state,site,'z'));
+            return states;
+        }
+        case 'D':
+        {
+            states.emplace_back(S_alpha_i_act(state,site,'x'));
+            states.emplace_back(S_alpha_i_act(state,site,'y'));
+            states.emplace_back(S_alpha_i_act(state,site,'z'));
+            return states;
+        }
+    }
+}
+
 
 std::tuple<uint, uint> determine_CET_depth( const ham::Hamiltonian& H, const ps::ParameterSpace& pspace )
 // Determine the depth of the Chebyshev expansion needed to minimize the thermalization and evolution errors
@@ -172,12 +245,15 @@ State RK4( ham::Hamiltonian& H, State& state, const RealType dt )
 }
 
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce 
-void MPI_share_results( RealType& partition_function, CorrTen& spin_c )
+void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations )
 {
     // share correlation results
-    std::vector<RealType> rcv_buf( spin_c.size() ); 
-    MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
-    spin_c = rcv_buf;
+    std::for_each( correlations.begin(), correlations.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
 
     // share partition function results
     std::vector<RealType> send_buf = { partition_function };
@@ -186,12 +262,12 @@ void MPI_share_results( RealType& partition_function, CorrTen& spin_c )
     partition_function = receive_buf.at(0);
 }
 
-void normalize( RealType& partition_function, CorrTen& spin_c )
+void normalize( RealType& partition_function, CorrelationTensor& correlations )
 {
-    for( uint i = 0; i < spin_c.size(); i++ )
+    std::for_each( correlations.begin(), correlations.end(), [&partition_function]( CorrelationVector& spin_c ) 
     {
-        spin_c[i] /= partition_function;
-    }
+        spin_c *= RealType{1.0}/partition_function; 
+    } );
 }
 
 }

@@ -102,7 +102,7 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
 }
 
 
-void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrTen& corr )
+void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr )
 {
     if( !m_storing_permission ){ return; } // permission request
 
@@ -123,6 +123,7 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrTen& 
     hdf5r::store_scalar( ps_group_id, "h_z", pspace.h_z );
     hdf5r::store_scalar( ps_group_id, "num_TimePoints",               pspace.num_TimePoints ); 
     hdf5r::store_scalar( ps_group_id, "delta_t",                  pspace.dt );
+    hdf5r::store_scalar( ps_group_id, "num_Cores", pspace.world_size);
 
     hdf5r::store_string( ps_group_id, "original project_name",       pspace.project_name );
 
@@ -131,11 +132,17 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrTen& 
     // ===== store results =====
     m_results_group_id = H5Gcreate( m_file_id, "results", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
     
-    hdf5r::store_list( m_results_group_id, "g_zz", corr );
+    store_correlation_tensor( corr, m_results_group_id, "correlation", "Correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
 
     H5Gclose( m_results_group_id );
 }
 
+void HDF5_Storage::store_correlation_tensor( const CorrelationTensor& CT, const hid_t group_id, const std::string dataset_name, const std::string dataset_info )
+{   
+    if( !m_storing_permission ){ return; } // permission request
+
+    hdf5r::store_2D_tensor<ComplexType>(group_id, dataset_name, H5_REAL_TYPE, CT, dataset_info);
+}
 
 void HDF5_Storage::finalize()
 {

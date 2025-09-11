@@ -1,6 +1,8 @@
 #pragma once
 
 #include"../Types/Types.h"
+#include"../Types/Tensors.h"
+#include"../Types/Correlations.h"
 #include"../cpp_libs/HDF5_Routines.h"
 #ifdef USE_DOUBLE
 static hid_t H5_REAL_TYPE = H5T_IEEE_F64LE;
@@ -14,6 +16,8 @@ static hid_t H5_REAL_TYPE = H5T_IEEE_F32LE;
 namespace Storage_Concept
 {
 
+using CorrelationTensor = Tensors::CorrelationTensor<Correlations::CorrelationVector>;
+
 namespace ps = Parameter_Space;
 
 
@@ -24,7 +28,7 @@ class HDF5_Storage
  public:
     HDF5_Storage( const int my_rank, const ps::ParameterSpace& pspace );
 
-    void store_main( const ps::ParameterSpace& pspace, const std::vector<RealType>& corr );
+    void store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr );
 
     void finalize();
 
@@ -38,7 +42,7 @@ class HDF5_Storage
 
     void create_folder_branch( const ps::ParameterSpace& pspace );
     void create_file( const ps::ParameterSpace& pspace );
-    void store_corr( const CorrTen data );
+    void store_correlation_tensor( const CorrelationTensor& CT, const hid_t group_id, const std::string dataset_name, const std::string dataset_info );
 };
 
 

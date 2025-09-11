@@ -53,6 +53,13 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "h_z", bpo::value<RealType>()->default_value(RealType{0.}),
     "set the value of the magnetic field in the z direction"
+    )(
+    "symm_type", bpo::value<char>()->default_value('D'),
+    "set the correlation symmetry type || options are: \
+    A = (gab=0, gxx=gyy=gzz), \
+    B = (gab=0, gxx=gyy), \
+    C = (gaz=0, gxx=gyy), \
+    D = (no constraints)"
     );
 
     // ========== general numerical parameters ==========
@@ -123,6 +130,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
     h_z = vm["h_z"].as<RealType>();
+    symmetry_type = vm["symm_type"].as<char>();
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
