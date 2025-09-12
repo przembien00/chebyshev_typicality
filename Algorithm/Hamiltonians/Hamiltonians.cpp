@@ -63,15 +63,15 @@ State act_ISO_h( const State& state, const Hamiltonian& H )
 {   
     State new_state = - H.b_over_a * state; // shift to make the spectrum symmetrical
 
-    for( long i = 0; i < H.numSpins; ++i )
+    for( long ident = 0; ident < H.dim; ++ident )
     {
-        for( long j = i; j < H.numSpins; ++j )
+        for( long i = 0; i < H.numSpins; ++i )
         {
-            RealType J = H.couplings(i,j);
-            if( J == RealType{0.0} ) continue; // skip zero couplings
-
-            for( long ident = 0; ident < H.dim; ++ident )
+            for( long j = i; j < H.numSpins; ++j )
             {
+                RealType J = H.couplings(i,j);
+                if( J == RealType{0.0} ) continue; // skip zero couplings
+
                 // Apply the Hamiltonian term to the state
 
                 // S_i^z * S_j^z
@@ -92,24 +92,19 @@ State act_ISO_h( const State& state, const Hamiltonian& H )
                     long new_ident = ( ident ^ ( 1L << j ) ) ^ ( 1L << i );
                     new_state[new_ident] += RealType{0.5} * J * state[ident];
                 }
-                
-                // h^z * S_i^z
+            }
 
-                if( j == i )
-                {
-                    if( ident >> i & 1L )
-                    {
-                        new_state[ident] = RealType{0.5} * H.params.h_z * state[ident];
-                    }
-                    else
-                    {
-                        new_state[ident] = - RealType{0.5} * H.params.h_z * state[ident];
-                    }
-                }
+            // h_z * S_i^z
+
+            if( ident >> i & 1L )
+            {
+                new_state[ident] += RealType{0.5} * H.params.h_z * state[ident];
+            }
+            else
+            {
+                new_state[ident] += - RealType{0.5} * H.params.h_z * state[ident];
             }
         }
-
-
     }
 
     return new_state;
@@ -182,6 +177,7 @@ couplings( pspace.couplings )
     b = (eigenvalue_max + eigenvalue_min) / RealType{2.};
     b_over_a = b/a;
     couplings = couplings / a;
+    params.h_z = params.h_z / a;
 }
 
 };

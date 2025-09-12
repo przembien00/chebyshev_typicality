@@ -28,7 +28,7 @@ class HDF5_Storage
  public:
     HDF5_Storage( const int my_rank, const ps::ParameterSpace& pspace );
 
-    void store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr );
+    void store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im );
 
     void finalize();
 

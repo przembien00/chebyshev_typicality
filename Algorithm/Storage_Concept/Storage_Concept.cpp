@@ -102,7 +102,7 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
 }
 
 
-void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr )
+void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im )
 {
     if( !m_storing_permission ){ return; } // permission request
 
@@ -132,7 +132,8 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
     // ===== store results =====
     m_results_group_id = H5Gcreate( m_file_id, "results", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
     
-    store_correlation_tensor( corr, m_results_group_id, "correlation", "Correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
+    store_correlation_tensor( corr_Re, m_results_group_id, "Re_correlation", "Real part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
+    store_correlation_tensor( corr_Im, m_results_group_id, "Im_correlation", "Imaginary part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
 
     H5Gclose( m_results_group_id );
 }
@@ -141,7 +142,7 @@ void HDF5_Storage::store_correlation_tensor( const CorrelationTensor& CT, const 
 {   
     if( !m_storing_permission ){ return; } // permission request
 
-    hdf5r::store_2D_tensor<ComplexType>(group_id, dataset_name, H5_REAL_TYPE, CT, dataset_info);
+    hdf5r::store_2D_tensor<RealType>(group_id, dataset_name, H5_REAL_TYPE, CT, dataset_info);
 }
 
 void HDF5_Storage::finalize()

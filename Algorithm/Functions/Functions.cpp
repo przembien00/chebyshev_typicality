@@ -20,10 +20,10 @@ namespace Functions
 using CorrelationTensor = Tensors::CorrelationTensor<Correlations::CorrelationVector>;
 using CorrelationVector = Correlations::CorrelationVector;
 
-RealType cdot( const State& state1, const State& state2 )
+ComplexType cdot( const State& state1, const State& state2 )
 // Complex scalar product of two states
 {
-    return std::real(blaze::dot( blaze::conj(state1), state2 ));
+    return blaze::dot( blaze::conj(state1), state2 );
 }
 
 size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank )
@@ -115,46 +115,82 @@ State S_alpha_i_act( const State& state, const long site, char alpha )
     }
 }
 
-void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs )
+void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im )
 {
+    ComplexType c;
     switch( pspace.symmetry_type )
     {
         case 'A':
         {
-            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
+            corrs_Re(2,2)[t] = std::real(c);
+            corrs_Im(2,2)[t] = std::imag(c);
             break;
         }
         case 'B':
         {
-            std::cout<< "B\n";
-            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
-            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs_Re(0,0)[t] = std::real(c);
+            corrs_Im(0,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
+            corrs_Re(2,2)[t] = std::real(c);
+            corrs_Im(2,2)[t] = std::imag(c);
             break;
         }
         case 'C':
         {
-            std::cout<< "C\n";
-            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
-            corrs(1,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
-            corrs(0,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
-            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs_Re(0,0)[t] = std::real(c);
+            corrs_Im(0,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
+            corrs_Re(1,0)[t] = std::real(c);
+            corrs_Im(1,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
+            corrs_Re(0,1)[t] = std::real(c);
+            corrs_Im(0,1)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            corrs_Re(2,2)[t] = std::real(c);
+            corrs_Im(2,2)[t] = std::imag(c);
             break;
         }
         case 'D':
         {
-            std::cout<< "D\n";
-            corrs(0,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
-            corrs(0,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
-            corrs(0,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'x' ) );
-            corrs(1,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
-            corrs(1,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'y' ) );
-            corrs(1,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'y' ) );
-            corrs(2,0)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
-            corrs(2,1)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
-            corrs(2,2)[t] = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
+            corrs_Re(0,0)[t] = std::real(c);
+            corrs_Im(0,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
+            corrs_Re(0,1)[t] = std::real(c);
+            corrs_Im(0,1)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'x' ) );
+            corrs_Re(0,2)[t] = std::real(c);
+            corrs_Im(0,2)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
+            corrs_Re(1,0)[t] = std::real(c);
+            corrs_Im(1,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'y' ) );
+            corrs_Re(1,1)[t] = std::real(c);
+            corrs_Im(1,1)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'y' ) );
+            corrs_Re(1,2)[t] = std::real(c);
+            corrs_Im(1,2)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
+            corrs_Re(2,0)[t] = std::real(c);
+            corrs_Im(2,0)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
+            corrs_Re(2,1)[t] = std::real(c);
+            corrs_Im(2,1)[t] = std::imag(c);
+            c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
+            corrs_Re(2,2)[t] = std::real(c);
+            corrs_Im(2,2)[t] = std::imag(c);
             break;
         }
     }
+}
+
+std::tuple<RealType, RealType> correlation( State& psi_L, State& psi_R, long site, char alpha )
+{
+    ComplexType c = cdot( psi_L, S_alpha_i_act( psi_R, site, alpha ) );
+    return std::make_tuple( std::real(c), std::imag(c) );
 }
 
 States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site )
@@ -245,10 +281,17 @@ State RK4( ham::Hamiltonian& H, State& state, const RealType dt )
 }
 
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations )
+void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im )
 {
     // share correlation results
-    std::for_each( correlations.begin(), correlations.end(), []( CorrelationVector& spin_c ) 
+    std::for_each( correlations_Re.begin(), correlations_Re.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Im.begin(), correlations_Im.end(), []( CorrelationVector& spin_c ) 
     {
         std::vector<RealType> rcv_buf( spin_c.size() ); 
         MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );

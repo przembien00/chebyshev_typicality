@@ -26,7 +26,7 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
 
 State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample );
 
-void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs );
+void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im );
 
 State S_alpha_i_act( const State& state, const long site, char alpha );
 
@@ -36,7 +36,7 @@ RealType CET_coeff( int n, RealType x );
 
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth );
 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& spin_c );
+void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im );
 
 void normalize( RealType& partition_function, CorrelationTensor& spin_c );
 
