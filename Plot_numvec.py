@@ -44,9 +44,9 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_cores = 8
-N_spins = 20
-N_array = np.array( [1, 3, 5, 10, 12, 25, 37, 50, 75, 100 ] )
+N_cores = 4
+N_spins = 18
+N_array = np.array( [1, 3, 5, 10, 25, 50, 80, 100, 120, 150 ] )
 plt.figure(constrained_layout=True)
 all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
 N_array = N_array[0:-1]
