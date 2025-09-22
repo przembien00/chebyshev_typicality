@@ -41,18 +41,16 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.2,0.4,0.6,0.8,1.]
-
-sqsums = np.array([])
+beta_array = [0.2, 0.4, 0.6, 0.8, 1.0]
 
 for beta in beta_array:
 
-    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=20__beta={beta:.2g}__h_z=2__rescale=0.5")
+    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=20__beta={beta:.2g}__h_z=5__rescale=0.5")
 
     G_1 = np.array( [ gab for gab in all_1['results']['Re_correlation']][0] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
     G_mirror = np.concatenate((G_1,np.flip(G_1)))
-    plt.plot(times, G_mirror, label=rf'$\beta$={beta}')
+    plt.plot(times, G_mirror, label=rf'$\beta={beta:.2g}$')
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')
@@ -60,4 +58,3 @@ plt.ylabel(r'$g_{xx}$($\tau$)')
 plt.legend()
 
 plt.savefig("Plots/Test_h.pdf")
-plt.clf()

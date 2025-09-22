@@ -67,7 +67,7 @@ void Simple_Estimator::estimate( const int iteration )
         print::print_R0(my_rank, "---------- \033[1mProgress of " + task_name + "\033[0m ----------\n");
     }
     RealType progress = static_cast<RealType>(iteration + 1) / static_cast<RealType>(num_iterations);
-    int bar_width = 46; // Width of the progress bar
+    int bar_width = 50; // Width of the progress bar
     print::print_R0(my_rank, "\r[");
     int filled = static_cast<int>(bar_width * progress);
     for (int i = 0; i < filled; ++i)

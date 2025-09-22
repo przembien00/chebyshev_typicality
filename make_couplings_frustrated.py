@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 # Define the lattice row sizes
 Lx = 4
-Ly = 4
+Ly = 5
 N = Lx*Ly
 
 

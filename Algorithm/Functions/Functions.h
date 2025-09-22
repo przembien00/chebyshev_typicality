@@ -32,9 +32,7 @@ State S_alpha_i_act( const State& state, const long site, char alpha );
 
 States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site );
 
-RealType CET_coeff( int n, RealType x );
-
-void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth );
+void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type );
 
 void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im );
 

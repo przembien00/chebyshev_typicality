@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import h5py as h5
 
 
+
 def ImportData(physical_data, project_name = ""):
     # process the inserted data:
     root_folder = "Data"
@@ -67,38 +68,43 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     
     return all, disc 
 
-beta_array = [1, 2, 3, 4]
+beta_array = [0.2, 0.6, 0.8, 1]
 
 sqsums = np.array([])
 
+plt.style.use('ggplot')
+
+
+
 for beta in beta_array:
 
-    all_16, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
-    all_18, times = ImportData(f"ISO__Square_NN_PBC_N=18__beta={beta:.2g}__rescale=0.5")
+    # all_16, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
+    all_18, times = ImportData(f"ISO__Square_Frustrated_PBC_N=18__beta={beta:.2g}__rescale=0.447214")
     all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}", project="", extension="")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
-    G_16 = np.array( [ gab for gab in all_16['results']['g_zz']] )
+    # G_16 = np.array( [ gab for gab in all_16['results']['g_zz']] )
     G_18 = np.array( [ gab for gab in all_18['results']['g_zz']] )
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
     G_sdmft = np.array( [ gab for gab in all_sdmft['results']['correlation']] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
-    G_mirror_16 = np.concatenate((G_16,np.flip(G_16)))
+    # G_mirror_16 = np.concatenate((G_16,np.flip(G_16)))
     G_mirror_18 = np.concatenate((G_18,np.flip(G_18)))
-    plt.plot(times, G_mirror_16, label = rf'Chebyshev 16, $\beta$={beta:.2g}')
-    plt.plot(times, G_mirror_18, label = rf'Chebyshev 18, $\beta$={beta:.2g}')
+    # plt.plot(times, G_mirror_16, label = rf'Chebyshev 16, $\beta$={beta:.2g}')
     # plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
     
-    plt.plot(times_sdmft, G_sdmft[0], '--', label = rf'spinDMFT, $\beta$={beta:.2g}')
+    plt.plot(times_sdmft, G_sdmft[0], label = rf'spinDMFT, $\beta J_Q$={beta:.2g}')
+    plt.plot(times, G_mirror_18, '--', label = rf'Chebyshev N=18, $\beta J_Q$={beta:.2g}')
+
     # sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')
-# plt.ylim(0.24, 0.26)
-plt.legend()
-
-plt.savefig("Plots/Test_spindmft.pdf")
+plt.ylim(0.2325, 0.2501)
+plt.xlim(0, 1)
+plt.legend(fontsize=7)
+plt.savefig("Plots/spinDMFT_vs_Frustrated_18.pdf", dpi=1000)
 plt.clf()
 # plt.plot(beta_array, sqsums, 'o')
 # plt.yscale('log')
