@@ -43,19 +43,19 @@ class ParameterSpace
     RealType rescale;
     RealType h_z;
     char symmetry_type;
+    std::string evol_type;
 
     // Numerical parameters
     RealType CET_therm_error; // Error threshold for thermalization
     RealType CET_evol_error; // Error threshold
     std::string seed;
     uint num_TimePoints;
-    uint num_TimeSteps_therm;
     uint num_Vectors_Per_Core;
     RealType Gauss_covariance; // Covariance of the distribution used to draw states
     RealType dt;
     RealType CET_rescale;
-    RealType dt_therm;
     uint num_PrintDigits;
+    RealType Tmax;
 
     // PUBLIC METHODS
     void read_SpinSystem();

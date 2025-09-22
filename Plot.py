@@ -18,7 +18,7 @@ def ImportData(physical_data, project_name = ""):
 
     # discretization
     params =  all['parameters']
-    disc = np.linspace(0., 1, params.attrs['num_TimePoints'])
+    disc = np.linspace(0., 2., params.attrs['num_TimePoints'])
 
     return all, disc
 
@@ -41,7 +41,7 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.2, 0.4, 0.6, 0.8]
+beta_array = [0]
 
 sqsums = np.array([])
 
@@ -51,13 +51,13 @@ for beta in beta_array:
 
     all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_02_08")
 
-    G_1 = np.array( [ gab for gab in all_1['results']['g_zz']] )
-    G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
+    G = np.array( [ gab for gab in all_1['results']['Re_correlation']][0] )
+    # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
-    G_mirror = np.concatenate((G_1,np.flip(G_1)))
-    plt.plot(times_ed, G_mirror, label = rf'Chebyshev, $\beta$={beta:.2g}')
-    plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
-    sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
+    # G_mirror = np.concatenate((G_1,np.flip(G_1)))
+    plt.plot(times, G, label = rf'Chebyshev, $\beta$={beta:.2g}')
+    # plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
+    # sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')
@@ -66,6 +66,6 @@ plt.legend()
 
 plt.savefig("Plots/Test.pdf")
 plt.clf()
-plt.plot(beta_array, sqsums, 'o')
-plt.yscale('log')
-plt.savefig("Plots/errors_beta.pdf")
+# plt.plot(beta_array, sqsums, 'o')
+# plt.yscale('log')
+# plt.savefig("Plots/errors_beta.pdf")

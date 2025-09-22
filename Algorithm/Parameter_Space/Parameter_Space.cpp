@@ -60,6 +60,11 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     B = (gab=0, gxx=gyy), \
     C = (gaz=0, gxx=gyy), \
     D = (no constraints)"
+    )(
+    "evol_type", bpo::value<std::string>()->default_value("imaginary"),
+    "set the type of time evolution || options are : \
+    imaginary = imaginary time evolution, \
+    real = real time evolution"
     );
 
     // ========== general numerical parameters ==========
@@ -71,17 +76,14 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
     "set the number of time points for the equidistant time discretization"
     )(
+    "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
+    "set the maximum time for real time evolution"
+    )(
     "GaussCovariance", bpo::value<RealType>()->default_value(RealType{1.0}), 
     "set the covariance of the distribution used to draw random states"
     )(
     "numVectorsPerCore", bpo::value<uint>()->default_value(uint{1}),
     "set the number of vectors drawn and averaged over"
-    )(
-    "ChebyshevRescale", bpo::value<RealType>()->default_value(RealType{4}),
-    "set the rescaling of the Hamiltonian for CET"
-    )(
-    "dt", bpo::value<RealType>()->default_value(RealType{0.05}),
-    "set the timestep, RK4 error scales like dt^5"
     )(
     "CET_therm_error", bpo::value<RealType>()->default_value(RealType{1e-10}),
     "set the error threshold for thermalization, used to determine the Chebyshev expansion depth"
@@ -131,16 +133,24 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     spin_model = vm["spinmodel"].as<std::string>();
     h_z = vm["h_z"].as<RealType>();
     symmetry_type = vm["symm_type"].as<char>();
+    evol_type = vm["evol_type"].as<std::string>();
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
     CET_therm_error = vm["CET_therm_error"].as<RealType>();
     CET_evol_error = vm["CET_evol_error"].as<RealType>();
     num_TimePoints = vm["numTimePoints"].as<uint>();
-    dt = beta * RealType{0.5} / static_cast<RealType>(num_TimePoints - 1);
+    if( evol_type == "real" )
+    {
+        Tmax = vm["Tmax"].as<RealType>();
+    }
+    else if( evol_type == "imaginary" )
+    {
+        Tmax = beta * RealType{0.5};
+    }
+    dt = Tmax / static_cast<RealType>(num_TimePoints - 1);
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
-    CET_rescale = vm["ChebyshevRescale"].as<RealType>();
 
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
