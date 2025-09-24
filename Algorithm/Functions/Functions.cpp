@@ -256,25 +256,25 @@ ComplexType CET_coeff( int n, RealType t, RealType a, RealType b, std::string ev
     }
     else
     {
-        RealType sign = (a*t>0. && n&1)? RealType{-1.0} : RealType{1.0};
-        return 2 * sign * std::exp(b*t) * boost::math::cyl_bessel_i( static_cast<RealType>(n), std::abs(a*t) );
+        RealType sign = (a*t<0. && n&1)? RealType{-1.0} : RealType{1.0};
+        return RealType{2.0} * sign * std::exp(b*t) * boost::math::cyl_bessel_i( static_cast<RealType>(n), std::abs(a*t) );
     }
     }
     else
     {
     if( n == 0 )
     {
-        return std::exp(ComplexType{0.,-b*t}) * boost::math::cyl_bessel_j( RealType{0.0}, std::abs(a*t) );
+        return std::exp(ComplexType{0.,b*std::abs(t)}) * boost::math::cyl_bessel_j( RealType{0.0}, std::abs(a*t) );
     }
     else
     {
-        RealType sign = (a*t<0. && n&1)? RealType{-1.0} : RealType{1.0};
-        return 2 * sign * pow(ComplexType{0.,1.}, n) * std::exp(ComplexType{0.,-b*t}) * boost::math::cyl_bessel_j( static_cast<RealType>(n), std::abs(a*t) );
+        // RealType sign = (a*t<0. && n&1)? RealType{-1.0} : RealType{1.0};
+        return RealType{2.0} * pow(ComplexType{0.,1.}, n) * std::exp(ComplexType{0.,b*std::abs(t)}) * boost::math::cyl_bessel_j( static_cast<RealType>(n), std::abs(a*t) );
     }
     }
 }
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type )
-// Apply e^(-tH) to the state using the Chebyshev expansion technique.
+// Apply e^(-tH)/e^(-itH) to the state using the Chebyshev expansion technique.
 // The state is modified in place.
 {
     State state_final = CET_coeff( 0, t, H.a, H.b, evol_type ) * state; // a_0|psi_0>
@@ -290,19 +290,8 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::
     state = state_final;
 }
 
-State RK4( ham::Hamiltonian& H, State& state, const RealType dt )
-{
-    State state_out = state;
-    for( uint n = 1; n < 5; n++ )
-    {
-        state = H.act( state ) * dt / static_cast<RealType>(n);
-        state_out += state;
-    }
-    return state_out;
-}
-
-// sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce 
 void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im )
+// sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce
 {
     // share correlation results
     std::for_each( correlations_Re.begin(), correlations_Re.end(), []( CorrelationVector& spin_c ) 
