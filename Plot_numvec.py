@@ -21,7 +21,7 @@ def ImportData(physical_data, project_name = ""):
 
     # discretization
     params =  all['parameters']
-    disc = np.linspace(0., 0.5, params.attrs['num_TimePoints'])
+    disc = np.linspace(0., 5, params.attrs['num_TimePoints'])
 
     return all, disc
 
@@ -44,40 +44,40 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_cores = 4
-N_spins = 18
-N_array = np.array( [1, 3, 5, 10, 25, 50, 80, 100, 120, 150 ] )
+N_cores = 8
+N_spins = 20
+N_array = np.array( [1, 3, 9, 12, 15, 20, 30 ] )
 plt.figure(constrained_layout=True)
-all_conv, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
+all_conv, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={N_array[-1]}")
 N_array = N_array[0:-1]
-G_conv = np.array( [ gab for gab in all_conv['results']['g_zz']] )
-G_conv = np.concatenate((G_conv,np.flip(G_conv)))
+G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][0] )
+# G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 
 sqsums = np.array([])
 
 for n in N_array:
 
-    all_1, times = ImportData(f"NumVec_DOUBLE/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={n}")
+    all, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={n}")
 
-    all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
+    # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
-    G_1 = np.array( [ gab for gab in all_1['results']['g_zz']] )
+    G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
     # print(G_1[-1])
-    G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
+    # G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
     # print(np.abs(G_1[-1]))
-    G_mirror = np.concatenate((G_1,np.flip(G_1)))
-    plt.plot(times_ed, G_mirror, label = rf'NumVec={N_cores*n}')
-    sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_conv)**2)**0.5/len(G_mirror))
+    # G_mirror = np.concatenate((G_1,np.flip(G_1)))
+    plt.plot(times, G, label = rf'NumVec={N_cores*n}')
+    sqsums = np.append(sqsums, np.sum(np.abs(G-G_conv)**2)**0.5/len(G))
 
 
-plt.plot(times_ed, G_ed, 'b--', label = rf'ED')
+# plt.plot(times_ed, G_ed, 'b--', label = rf'ED')
 
 # plt.ylim(0, 0.5)
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'difference')
 plt.legend()
 
-plt.savefig(f"Plots/Test_NumVec_beta=1_{N_spins}.pdf")
+plt.savefig(f"Plots/Test_NumVec_beta=0_{N_spins}.pdf")
 plt.clf()
 
 par, cov = curve_fit(F, N_cores*N_array, sqsums)
@@ -88,4 +88,4 @@ plt.ylabel('error conv')
 # plt.yscale('log')
 plt.loglog(N_cores*N_array, sqsums, 'o')
 plt.loglog(N_cores*N_array, F(N_cores*N_array, par[0]))
-plt.savefig(f"Plots/NumVec_errors_beta=1_{N_spins}.pdf")
+plt.savefig(f"Plots/NumVec_errors_beta=0_{N_spins}.pdf")

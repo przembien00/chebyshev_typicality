@@ -45,16 +45,16 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     Z += std::pow( std::real(blaze::norm(psi_L)) , 2 ); // Z = <psi_0|e^(-beta*H)|psi_0>
     // Evolve: loop over times
 
-    States v_psi_R = func::S_i_act( my_pspace, psi_L, 0 ); // S^a_0 e^(-beta*H/2)|psi_0>
+    States v_psi_R = func::S_i_act( my_pspace, psi_L, my_pspace.spin_site ); // S^a_0 e^(-beta*H/2)|psi_0>
     func::compute_correlations_at( 0, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I );
-    for( uint i = 1; i < my_pspace.num_TimePoints; i++ )
+    for( uint t_point = 1; t_point < my_pspace.num_TimePoints; t_point++ )
     {
         std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &my_pspace, &depth_dt]( State& psi_R )
         {
         func::CET( my_H, psi_R, my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
         } );
         func::CET( my_H, psi_L, - my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(tau H) e^(-beta H/2)|psi_0>
-        func::compute_correlations_at( i, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_0 e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
+        func::compute_correlations_at( t_point, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_0 e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
     }
     correlations_R += new_correlations_R;
     correlations_I += new_correlations_I;

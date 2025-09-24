@@ -44,6 +44,7 @@ class ParameterSpace
     RealType h_z;
     char symmetry_type;
     std::string evol_type;
+    uint spin_site;
 
     // Numerical parameters
     RealType CET_therm_error; // Error threshold for thermalization

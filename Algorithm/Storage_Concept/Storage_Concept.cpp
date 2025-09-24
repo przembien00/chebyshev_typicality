@@ -55,7 +55,12 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
     // create filename:
     std::string filename = pspace.spin_model; // spin model info
     filename += "__" + pspace.couplings_filename;
+    filename += pspace.evol_type + "_ev"; // evolution type info
     std::stringstream params_stream;
+    if( pspace.spin_site != 0 )
+    {
+        params_stream << "__site=" << pspace.spin_site;
+    }
     params_stream << "__beta=" << pspace.beta;
     if( pspace.h_z != RealType{0.} )
     {
@@ -115,9 +120,10 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
     std::string tmp{ pspace.couplings_filename + ".hdf5" };
     hdf5r::store_string( ps_group_id, "src_file",                   tmp );
     hdf5r::store_string( ps_group_id, "spin_model",                 pspace.spin_model );
-
-    //hdf5r::add_char_to_group( ps_group_id, "mean_symmetry_type",           pspace.spin_model.m_means._symmetry_type );
-    //hdf5r::add_char_to_group( ps_group_id, "correlation_symmetry_type",    pspace.spin_model.m_correlations._symmetry_type );
+    hdf5r::store_scalar( ps_group_id, "rescale",                    pspace.rescale );
+    hdf5r::store_scalar( ps_group_id, "spin_site",                  pspace.spin_site );
+    hdf5r::store_string( ps_group_id, "evol_type",                  pspace.evol_type );
+    hdf5r::store_scalar( ps_group_id, "Tmax",                       pspace.Tmax );
 
     hdf5r::store_scalar( ps_group_id, "beta", pspace.beta );
     hdf5r::store_scalar( ps_group_id, "h_z", pspace.h_z );

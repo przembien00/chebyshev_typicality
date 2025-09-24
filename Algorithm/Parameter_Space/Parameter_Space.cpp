@@ -65,6 +65,10 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "set the type of time evolution || options are : \
     imaginary = imaginary time evolution, \
     real = real time evolution"
+    )(
+    "spin_site", bpo::value<uint>()->default_value(uint{0}),
+    "set the spin with which the correlations are computed \
+    (they look like < S_0^a(t) S_i^b(0) >, where i is spin_site and 0 the first spin in the coupling file)"
     );
 
     // ========== general numerical parameters ==========
@@ -134,6 +138,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     h_z = vm["h_z"].as<RealType>();
     symmetry_type = vm["symm_type"].as<char>();
     evol_type = vm["evol_type"].as<std::string>();
+    spin_site = vm["spin_site"].as<uint>();
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
