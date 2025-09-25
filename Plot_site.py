@@ -44,24 +44,21 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0]
+site_array = [0, 1, 2, 6]
 
 sqsums = np.array([])
 
-for beta in beta_array:
+for site in site_array:
 
-    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=20__site=6__beta={beta:.2g}__rescale=0.5", project_name="Real_Time")
+    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=20__site={site}__beta=0__rescale=0.5", project_name="Real_Time")
 
     G = np.array( [ gab for gab in all_1['results']['Re_correlation']][0] )
-    # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
-    # print(np.abs(G_ed[-1]-G_1[-1]))
-    # G_mirror = np.concatenate((G,-np.flip(G)))
-    plt.plot(times, G, label = rf'Chebyshev, $\beta$={beta:.2g}')
+    plt.plot(times, G, label = rf'Chebyshev, site={site}')
     # plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
     # sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
 
-plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'$g_{xx}$($\tau$)')
+plt.xlabel(r'$tJ_Q$')
+plt.ylabel(r'$g_{xx}$($t$)')
 # plt.ylim(0.24, 0.26)
 plt.legend()
 

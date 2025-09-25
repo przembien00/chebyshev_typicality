@@ -21,7 +21,7 @@ def ImportData(physical_data, project_name = ""):
 
     # discretization
     params =  all['parameters']
-    disc = np.linspace(0., 5, params.attrs['num_TimePoints'])
+    disc = np.linspace(0., 5., params.attrs['num_TimePoints'])
 
     return all, disc
 
@@ -46,9 +46,9 @@ def ImportData_ED(physical_data, project_name = ""):
 
 N_cores = 8
 N_spins = 20
-N_array = np.array( [1, 3, 9, 12, 15, 20, 30 ] )
+N_array = np.array( [ 3, 9, 12, 20, 30 ] )
 plt.figure(constrained_layout=True)
-all_conv, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={N_array[-1]}")
+all_conv, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={N_array[-1]}X")
 N_array = N_array[0:-1]
 G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][0] )
 # G_conv = np.concatenate((G_conv,np.flip(G_conv)))
@@ -57,7 +57,7 @@ sqsums = np.array([])
 
 for n in N_array:
 
-    all, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={n}")
+    all, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={n}X")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
