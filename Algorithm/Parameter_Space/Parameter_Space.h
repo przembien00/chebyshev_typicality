@@ -57,6 +57,9 @@ class ParameterSpace
     RealType CET_rescale;
     uint num_PrintDigits;
     RealType Tmax;
+    bool determine_bandwidth;
+    RealType E_max;
+    RealType E_min;
 
     // PUBLIC METHODS
     void read_SpinSystem();

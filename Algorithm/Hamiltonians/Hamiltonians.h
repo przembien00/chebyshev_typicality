@@ -22,13 +22,15 @@ class Hamiltonian
     RealType CET_rescale;
     CouplingMatrix couplings;
     Parameters params;
+    RealType E_max;
+    RealType E_min;
     RealType a;
     RealType b;
     RealType b_over_a;
 
     // constructors
     Hamiltonian() = default;
-    Hamiltonian(const ps::ParameterSpace& pspace);
+    Hamiltonian( ps::ParameterSpace& pspace);
 
     std::function<State(const State&)> act;
 };

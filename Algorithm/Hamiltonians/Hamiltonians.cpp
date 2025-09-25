@@ -126,7 +126,7 @@ void vector_initializer(std::vector<ComplexType>& v) {
   }
 }
 
-Hamiltonian::Hamiltonian( const ps::ParameterSpace& pspace ):
+Hamiltonian::Hamiltonian( ps::ParameterSpace& pspace ):
 numSpins( pspace.num_Spins ),
 CET_rescale( pspace.CET_rescale ),
 dim( pspace.HilbertSpaceDimension ),
@@ -147,7 +147,7 @@ couplings( pspace.couplings )
     // Define the action of the Hamiltonian based on the model.
     act = [model_map, model = spin_model, this](const State& state){
         return model_map.at(model)(state, *this);};
-
+    
     // Find the smallest and largest eigenvalue for the rescaling
     // Define matrix-vector multiplication in a suitable form
     auto mv_mul = [&](const std::vector<ComplexType>& in, std::vector<ComplexType>& out){
@@ -162,19 +162,26 @@ couplings( pspace.couplings )
             out[i] = psi[i];
         }
     };
-    // Apply lanczos
+    if( pspace.determine_bandwidth )
+    {
+    // Apply lanczos 
     lambda_lanczos::LambdaLanczos<ComplexType> engine_max(mv_mul, dim, true, 1);
     engine_max.init_vector = vector_initializer<ComplexType>;
-    RealType eigenvalue_max;
-    std::vector<ComplexType> eigenvector_max;
-    engine_max.run(eigenvalue_max, eigenvector_max);
+    std::vector<ComplexType> eigenvector;
+    engine_max.run(E_max, eigenvector);
     lambda_lanczos::LambdaLanczos<ComplexType> engine_min(mv_mul, dim, false, 1);
     engine_min.init_vector = vector_initializer<ComplexType>;
-    RealType eigenvalue_min;
-    std::vector<ComplexType> eigenvector_min;
-    engine_min.run(eigenvalue_min, eigenvector_min);
-    a = (eigenvalue_max - eigenvalue_min) / RealType{2.};
-    b = (eigenvalue_max + eigenvalue_min) / RealType{2.};
+    engine_min.run(E_min, eigenvector);
+    pspace.E_max = E_max;
+    pspace.E_min = E_min;
+    }
+    else
+    {
+        E_max = pspace.E_max;
+        E_min = pspace.E_min;
+    }
+    a = (E_max - E_min) / RealType{2.};
+    b = (E_max + E_min) / RealType{2.};
     b_over_a = b/a;
     couplings = couplings / a;
     params.h_z = params.h_z / a;

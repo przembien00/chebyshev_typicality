@@ -94,6 +94,16 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "CET_evol_error", bpo::value<RealType>()->default_value(RealType{1e-6}),
     "set the error threshold for time evolution, used to determine the Chebyshev expansion depth"
+    )(
+    "determine_bandwidth", bpo::value<bool>()->default_value(true),
+    "if true, the bandwidth of the Hamiltonian is determined via a Lanczos procedure \
+    if false, the values E_min and E_max are used"
+    )(
+    "E_max", bpo::value<RealType>()->default_value(RealType{1.0}),
+    "set the maximum eigenvalue of the Hamiltonian, needed for the Chebyshev expansion"    
+    )(
+    "E_min", bpo::value<RealType>()->default_value(RealType{-1.0}),
+    "set the minimum eigenvalue of the Hamiltonian, needed for the Chebyshev expansion"
     );
 
     // ========== storing and naming ==========
@@ -156,6 +166,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     dt = Tmax / static_cast<RealType>(num_TimePoints - 1);
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
+    determine_bandwidth = vm["determine_bandwidth"].as<bool>();
+    E_max = vm["E_max"].as<RealType>();
+    E_min = vm["E_min"].as<RealType>();
 
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
