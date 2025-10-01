@@ -3,8 +3,8 @@ import h5py as h5
 import matplotlib.pyplot as plt
 
 # Define the lattice row sizes
-Lx = 4
-Ly = 5
+Lx = 6
+Ly = 4
 N = Lx*Ly
 
 

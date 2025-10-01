@@ -21,7 +21,7 @@ def ImportData(physical_data, project_name = ""):
 
     # discretization
     params =  all['parameters']
-    disc = np.linspace(0., 5., params.attrs['num_TimePoints'])
+    disc = np.linspace(0., 1., 2*params.attrs['num_TimePoints'])
 
     return all, disc
 
@@ -44,20 +44,20 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_cores = 8
-N_spins = 20
-N_array = np.array( [ 3, 9, 12, 20, 30 ] )
+N_cores = 2
+N_spins = 24
+N_array = np.array( [ 1, 3, 5, 7, 9 ] )
 plt.figure(constrained_layout=True)
-all_conv, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={N_array[-1]}X")
+all_conv, times = ImportData(f"NumVec/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
 N_array = N_array[0:-1]
 G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][0] )
-# G_conv = np.concatenate((G_conv,np.flip(G_conv)))
+G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 
 sqsums = np.array([])
 
 for n in N_array:
 
-    all, times = ImportData(f"NumVec_Re/ISO__Square_NN_PBC_N={N_spins}__beta=0__rescale=0.5__numVecPerCore={n}X")
+    all, times = ImportData(f"NumVec/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={n}")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
@@ -65,7 +65,7 @@ for n in N_array:
     # print(G_1[-1])
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
     # print(np.abs(G_1[-1]))
-    # G_mirror = np.concatenate((G_1,np.flip(G_1)))
+    G = np.concatenate((G,np.flip(G)))
     plt.plot(times, G, label = rf'NumVec={N_cores*n}')
     sqsums = np.append(sqsums, np.sum(np.abs(G-G_conv)**2)**0.5/len(G))
 
@@ -74,10 +74,10 @@ for n in N_array:
 
 # plt.ylim(0, 0.5)
 plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'difference')
+plt.ylabel(r'g_zz($\tau$)')
 plt.legend()
 
-plt.savefig(f"Plots/Test_NumVec_beta=0_{N_spins}.pdf")
+plt.savefig(f"Plots/Test_NumVec_beta=1_{N_spins}.pdf")
 plt.clf()
 
 par, cov = curve_fit(F, N_cores*N_array, sqsums)
@@ -88,4 +88,4 @@ plt.ylabel('error conv')
 # plt.yscale('log')
 plt.loglog(N_cores*N_array, sqsums, 'o')
 plt.loglog(N_cores*N_array, F(N_cores*N_array, par[0]))
-plt.savefig(f"Plots/NumVec_errors_beta=0_{N_spins}.pdf")
+plt.savefig(f"Plots/NumVec_errors_beta=1_{N_spins}.pdf")
