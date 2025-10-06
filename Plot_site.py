@@ -44,13 +44,13 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-site_array = [0, 1, 2, 6]
+site_array = [0, 1, 2, 7]
 
 sqsums = np.array([])
 
 for site in site_array:
 
-    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=20__site={site}__beta=0__rescale=0.5", project_name="Real_Time")
+    all_1, times = ImportData(f"ISO__Square_NN_PBC_N=24__site={site}__beta=0__rescale=0.5", project_name="Real_Time")
 
     G = np.array( [ gab for gab in all_1['results']['Re_correlation']][0] )
     plt.plot(times, G, label = rf'Chebyshev, site={site}')
@@ -62,7 +62,7 @@ plt.ylabel(r'$g_{xx}$($t$)')
 # plt.ylim(0.24, 0.26)
 plt.legend()
 
-plt.savefig("Plots/Test.pdf")
+plt.savefig("Plots/Test_24.pdf")
 plt.clf()
 # plt.plot(beta_array, sqsums, 'o')
 # plt.yscale('log')

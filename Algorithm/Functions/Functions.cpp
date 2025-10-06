@@ -274,7 +274,7 @@ ComplexType CET_coeff( int n, RealType t, RealType a, RealType b, std::string ev
     }
 }
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type )
-// Apply e^(-tH)/e^(-itH) to the state using the Chebyshev expansion technique.
+// Apply e^(tH)/e^(-itH) to the state using the Chebyshev expansion technique.
 // The state is modified in place.
 {
     State state_final = CET_coeff( 0, t, H.a, H.b, evol_type ) * state; // a_0|psi_0>
