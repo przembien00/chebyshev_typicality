@@ -42,15 +42,15 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.2]
+beta_array = [0.2, 0.6, 0.8, 1.]
 
 for beta in beta_array:
 
-    all_1, times = ImportData(f"Mag_Field/ISO__Square_NN_PBC_N=24__beta={beta:.2g}__h_z=2__rescale=-0.5")
+    all_1, times = ImportData(f"Test/ISO__Square_NN_PBC_N=16__beta={beta:.2g}__h_z=2__rescale=-0.5")
 
-    G_1 = np.array( [ gab for gab in all_1['results']['Im_correlation']][1] )
+    G_1 = np.array( [ gab for gab in all_1['results']['Re_correlation']][3] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
-    G_1 = np.concatenate((G_1,-np.flip(G_1)))
+    G_1 = np.concatenate((G_1,np.flip(G_1)))
     plt.plot(times, G_1, label=rf'CET N=24, $\beta={beta:.2g}$')
 
 plt.xlabel(r'$\tau$/$\beta$')

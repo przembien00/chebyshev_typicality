@@ -13,7 +13,7 @@ for((i=0;i<$len;i++))
 do
 	d="${data[$i]}"
 	echo "RUNNING JOB WITH BETA = "$d
-	mpirun -n 4 executable_DOUBLE.out --spinmodel=ISO --srcfile=Square_NN_PBC_N=16 --numTimePoints=100 --beta=$d --numVectorsPerCore=100 --rescale=0.5 --project="Fixed_evol" 
+	mpirun -n 4 executable_DOUBLE.out --spinmodel=ISO --srcfile=Square_NN_PBC_N=16 --numTimePoints=50 --beta=$d --numVectorsPerCore=25 --rescale=-0.5 --project="Test" --h_z=2 --symm_type=C 
 wait
 done
 echo "DONE"
