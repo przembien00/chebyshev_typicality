@@ -68,7 +68,7 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     
     return all, disc 
 
-beta_array = [0.2, 0.6, 0.8, 1]
+beta_array = [0.2, 0.4, 0.6, 0.8]
 
 sqsums = np.array([])
 
@@ -79,15 +79,15 @@ plt.style.use('ggplot')
 for beta in beta_array:
 
     # all_16, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta:.2g}__rescale=0.5")
-    all, times = ImportData(f"FM/ISO__Square_NN_PBC_N=24__beta={beta:.2g}__rescale=-0.5")
-    all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}", project="", extension="")
+    all, times = ImportData(f"Mag_Field/ISO__Square_NN_PBC_N=24__beta={beta:.2g}__h_z=2__rescale=0.5")
+    all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"JL=-2__beta={beta:.2g}__h=z_h_abs=2", project="", extension="")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
     # G_16 = np.array( [ gab for gab in all_16['results']['g_zz']] )
-    G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
+    G = np.array( [ gab for gab in all['results']['Re_correlation']][3] )
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
-    G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']][0] )
+    G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']][3] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
     # G_mirror_16 = np.concatenate((G_16,np.flip(G_16)))
     G = np.concatenate((G,np.flip(G)))
@@ -100,10 +100,10 @@ for beta in beta_array:
     # sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
 
 plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'Im $g_{xy}$($\tau$)')
+plt.ylabel(r'$g_{xx}$($\tau$)')
 plt.xlim(0, 1)
 plt.legend(fontsize=7)
-plt.savefig("Plots/spinDMFT_vs_AFM.pdf", dpi=1000)
+plt.savefig("Plots/spinDMFT_vs_AFM_h_xx.pdf", dpi=1000)
 plt.clf()
 # plt.plot(beta_array, sqsums, 'o')
 # plt.yscale('log')
