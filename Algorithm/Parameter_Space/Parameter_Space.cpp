@@ -43,7 +43,8 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "spinmodel", bpo::value<std::string>()->default_value("ISO"),
     "set the spin model || options are : \
-    ISO = Isotropic Heisenberg Model, "
+    ISO = Isotropic Heisenberg Model, \
+    XXZ = Anisotropic Heisenberg Model"
     )(
     "beta", bpo::value<RealType>()->default_value(RealType{0.1}),
     "set the value of the inverse temperature"
@@ -53,6 +54,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "h_z", bpo::value<RealType>()->default_value(RealType{0.}),
     "set the value of the magnetic field in the z direction"
+    )(
+    "lambda", bpo::value<RealType>()->default_value(RealType{1.0}),
+    "set the anisotropy parameter lambda for the XXZ model"
     )(
     "symm_type", bpo::value<char>()->default_value('D'),
     "set the correlation symmetry type || options are: \
@@ -146,6 +150,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
     h_z = vm["h_z"].as<RealType>();
+    lambda = vm["lambda"].as<RealType>();
     symmetry_type = vm["symm_type"].as<char>();
     evol_type = vm["evol_type"].as<std::string>();
     spin_site = vm["spin_site"].as<uint>();
@@ -238,6 +243,10 @@ std::string ParameterSpace::create_essentials_string() const
     << print::quantity_to_output_line( pre_colon_space, "num_TimePoints" , std::to_string(num_TimePoints) ) 
     << print::quantity_to_output_line( pre_colon_space, "dt"       , print::remove_zeros(print::round_value_to_string(dt,num_PrintDigits)) ) 
     << print::quantity_to_output_line( pre_colon_space, "num_Vectors"   , std::to_string(num_Vectors_Per_Core*world_size) );
+    if( spin_model == "XXZ" )
+    {
+        ss << print::quantity_to_output_line( pre_colon_space, "lambda"          , print::remove_zeros(print::round_value_to_string(lambda,num_PrintDigits)) );
+    }
     
     return ss.str();
 }

@@ -61,6 +61,10 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
         params_stream << "__site=" << pspace.spin_site;
     }
     params_stream << "__beta=" << pspace.beta;
+    if (pspace.lambda != RealType{1.0})
+    {
+        params_stream << "__lambda=" << pspace.lambda;
+    }
     if( pspace.h_z != RealType{0.} )
     {
         params_stream << "__h_z=" << pspace.h_z;

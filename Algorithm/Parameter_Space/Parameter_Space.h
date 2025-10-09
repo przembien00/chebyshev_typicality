@@ -42,6 +42,7 @@ class ParameterSpace
     RealType beta; // Inverse temperature
     RealType rescale;
     RealType h_z;
+    RealType lambda;
     char symmetry_type;
     std::string evol_type;
     uint spin_site;
