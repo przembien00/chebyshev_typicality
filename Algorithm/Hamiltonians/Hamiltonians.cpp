@@ -58,6 +58,46 @@ State act_ISO( const State& state, const Hamiltonian& H )
     return new_state;
 }
 
+State act_XXZ( const State& state, const Hamiltonian& H )
+// Apply the XXZ Heisenberg Hamiltonian to the state vector.
+{   
+    State new_state = - H.b_over_a * state; // shift to make the spectrum symmetrical
+    for( long i = 0; i < H.numSpins; ++i )
+    {
+        for( long j = i; j < H.numSpins; ++j )
+        {
+            RealType J = H.couplings(i,j);
+            if( J == RealType{0.0} ) continue; // skip zero couplings
+
+            for( long ident = 0; ident < H.dim; ++ident )
+            {
+                // Apply the Hamiltonian term to the state
+
+                // S_i^z * S_j^z
+
+                if( ( ( ident >> i ) & 1L) == ( (ident >> j)  & 1L ) ) // check if the spins on sites i, j are in the same direction
+                {
+                    new_state[ident] += RealType{0.25} * J * H.params.lambda * state[ident];
+                }
+                else
+                {
+                    new_state[ident] += - RealType{0.25} * J * H.params.lambda * state[ident];
+                }
+
+                // 0.5 * ( S_i^+ * S_j^- + S_i^- * S_j^+ )
+
+                if( ( ( ident >> i ) & 1L) ^ ( (ident >> j)  & 1L ) )
+                {
+                    long new_ident = ( ident ^ ( 1L << j ) ) ^ ( 1L << i );
+                    new_state[new_ident] += RealType{0.5} * J * state[ident];
+                }
+
+            }
+        }
+    }
+    return new_state;
+}
+
 State act_ISO_h( const State& state, const Hamiltonian& H )
 // Apply the Isotropic Heisenberg Hamiltonian to the state vector.
 {   
@@ -139,9 +179,12 @@ couplings( pspace.couplings )
         params.h_z = pspace.h_z;
     }
 
+    std::cout << "Using spin model: " << spin_model << std::endl;
+    
     // Define a mapping from models to actions of the Hamiltonian
     std::map< std::string, std::function< State( const State&, const Hamiltonian& ) > > model_map{
         {"ISO", act_ISO},
+        {"XXZ", act_XXZ},
         {"ISO_h", act_ISO_h}
     };
     // Define the action of the Hamiltonian based on the model.

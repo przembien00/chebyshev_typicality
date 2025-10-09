@@ -42,14 +42,14 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.2, 0.4, 0.6, 0.8]
+beta_array = [0.2]
 
 sqsums = np.array([])
 
 for beta in beta_array:
 
-    all, times = ImportData(f"ISO__Square_Frustrated_PBC_N=24__beta={beta:.2g}__rescale=0.447214", project_name="Frustrated")
-    G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
+    all, times = ImportData(f"XXZ__Square_NN_PBC_N=16__beta={beta:.2g}__lambda=-2__rescale=-0.5", project_name="Test")
+    G = np.array( [ gab for gab in all['results']['Re_correlation']][1] )
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'{beta:.2f}']['fluctuation']][0] )
     # print(np.abs(G_ed[-1]-G_1[-1]))
     G= np.concatenate((G,np.flip(G)))
