@@ -178,6 +178,10 @@ couplings( pspace.couplings )
         spin_model += "_h";
         params.h_z = pspace.h_z;
     }
+    if(pspace.lambda != RealType{1.})
+    {
+        params.lambda = pspace.lambda;
+    }
     
     // Define a mapping from models to actions of the Hamiltonian
     std::map< std::string, std::function< State( const State&, const Hamiltonian& ) > > model_map{
