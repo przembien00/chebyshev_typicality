@@ -9,8 +9,8 @@ couplings = np.ones((N, N))  # Random couplings
 couplings -= np.diag(np.diag(couplings))  # Set diagonal to zero
 couplings /= np.sqrt(N-1)  # Scale
 print(couplings)
-JQ = np.sum(couplings**2, axis=0)[0]**0.5
-print(JQ)
+JL = np.sum(couplings, axis=0)[0]
+print(JL)
 # Save as HDF5
 with h5.File(f"Couplings/CW_N={N}.hdf5", "w") as f:
     all = f.create_group("all")

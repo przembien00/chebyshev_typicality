@@ -54,7 +54,7 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
 
     // create filename:
     std::string filename = pspace.spin_model; // spin model info
-    filename += "__Random";
+    filename += "__Random__N=" + std::to_string( pspace.num_Spins ); // system size info
     std::stringstream params_stream;
     if( pspace.spin_site != 0 )
     {
