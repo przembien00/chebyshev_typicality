@@ -74,29 +74,40 @@ sqsums = np.array([])
 
 # plt.style.use('ggplot')
 
-markers = ['v', '^', 's', 'x', 'D', '+']
+markers = ['v', '^', 's', 'x']
 
+b_list =  ['lightskyblue', 'cornflowerblue', 'dodgerblue', 'blue', 'mediumblue']
+r_list =  ['lightcoral', 'indianred', 'red', 'firebrick', 'darkred']
+g_list =  ['lightgreen', 'limegreen', 'green', 'forestgreen', 'darkgreen']
+fig, ax = plt.subplots()
 i=0
 for beta in beta_array:
 
-    all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=20")
-    if beta==1:
-        all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=40")
+    all_FM, times = ImportData(f"FM/ISO__Square_NN_PBC_N=24__beta={beta:.2g}__rescale=-0.5")
+    all_AFM, times = ImportData(f"AFM/ISO__Square_NN_PBC_N=24__beta={beta:.2g}__rescale=0.5")
     all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}", project="spinDMFT", extension="")
-    G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
+    G_FM = np.array( [ gab for gab in all_FM['results']['Re_correlation']][0] )
+    G_AFM = np.array( [ gab for gab in all_AFM['results']['Re_correlation']][0] )
     G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']][0] )
-    G = np.concatenate((G,np.flip(G)))
+    G_FM = np.concatenate((G_FM,np.flip(G_FM)))
+    G_AFM = np.concatenate((G_AFM,np.flip(G_AFM)))
     
-    plt.plot(times_sdmft, G_sdmft, label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
-    plt.plot(times, G, ':', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
+    ax.plot(times_sdmft, G_sdmft, label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], color='green', markevery=25)
+    ax.plot(times, G_FM, label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], color='dodgerblue', markevery=25)
+    ax.plot(times, G_AFM, label = rf'Chebyshev AFM, $\beta J_Q$={beta:.2g}', marker=markers[i], color='crimson', markevery=25)
     i+=1
 
-plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'$g_{xy}$($\tau$)')
-plt.xlim(0, 1)
-plt.legend(fontsize=7)
-plt.savefig("Plots/Random.pdf", dpi=1000)
-plt.clf()
-# plt.plot(beta_array, sqsums, 'o')
-# plt.yscale('log')
-# plt.savefig("Plots/errors_beta_18.pdf")
+ax.set_xlabel(r'$\tau$/$\beta$')
+ax.set_ylabel(r'$g_{xx}$($\tau$)')
+ax.set_xlim(0, 1)
+marker_p = []
+for m in markers:
+    sup_fig, sup_ax = plt.subplots()
+    picture, = sup_ax.plot([1], marker=m, color="black")
+    marker_p.append(picture)
+label_list = []
+for beta in beta_array:
+    label_list.append(rf'$\beta J_Q$={beta:.2g}')
+ax.legend(marker_p, label_list, loc=4)
+
+fig.savefig("Plots/SDMFT_AFM_FM.pdf", dpi=1000)
