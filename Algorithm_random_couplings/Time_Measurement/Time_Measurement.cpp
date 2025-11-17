@@ -27,6 +27,13 @@ void Clock::measure( const std::string& task )
         last_measurement = now;
         return;
     }
+    else if( duration > 600 )
+    {
+        duration = std::chrono::duration_cast<std::chrono::minutes>(now - last_measurement).count();
+        print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(duration) + " min\033[0m\n");
+        last_measurement = now;
+        return;
+    }
     last_measurement = now;
     print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(duration) + " s\033[0m\n");
 }
@@ -39,6 +46,12 @@ void Clock::finalize()
     {
         total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - program_start).count();
         print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " ms\n");
+        return;
+    }
+    if( total_duration > 600 )
+    {
+        total_duration = std::chrono::duration_cast<std::chrono::minutes>(end - program_start).count();
+        print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " min\n");
         return;
     }
     print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " s\n");
@@ -62,8 +75,22 @@ void Simple_Estimator::estimate( const int iteration )
         auto now = std::chrono::steady_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - start_time).count();
         auto estimated_duration = duration * num_iterations / 1000; // in seconds
-        print::print_R0(my_rank, "Single iteration duration: " + std::to_string(duration) + " ms\n");
-        print::print_R0(my_rank,"Estimated duration of " + task_name + ": " + std::to_string(estimated_duration) + " s\n");
+        if( duration > 10000 )
+        {
+            print::print_R0(my_rank, "Single iteration duration: " + std::to_string(duration/1000) + " s\n");
+        }
+        else
+        {
+            print::print_R0(my_rank, "Single iteration duration: " + std::to_string(duration) + " ms\n");
+        }
+        if( estimated_duration > 120 )
+        {
+            print::print_R0(my_rank,"Estimated duration of " + task_name + ": " + std::to_string(estimated_duration/60) + " min\n");
+        }
+        else
+        {
+            print::print_R0(my_rank,"Estimated duration of " + task_name + ": " + std::to_string(estimated_duration) + " s\n");
+        }
         print::print_R0(my_rank, "---------- \033[1mProgress of " + task_name + "\033[0m ----------\n");
     }
     RealType progress = static_cast<RealType>(iteration + 1) / static_cast<RealType>(num_iterations);

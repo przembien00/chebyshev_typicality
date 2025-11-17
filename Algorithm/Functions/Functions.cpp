@@ -52,17 +52,27 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
 
 State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample )
 {
-    std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
-    std::normal_distribution<RealType> d{0., pspace.Gauss_covariance};
     State state(pspace.HilbertSpaceDimension);
-    for( uint i = 0; i < state.size(); ++i )
+    if( pspace.full_diagonalization )
     {
-        RealType a = d(gen);
-        RealType b = d(gen);
-
-        state[i] = ComplexType{a, b};
+        size_t index = sample + pspace.my_rank * pspace.num_Vectors_Per_Core;
+        if( index < pspace.HilbertSpaceDimension )
+        {
+            state[index] = ComplexType{1.,0.};
+        }
     }
-    
+    else
+    {
+        std::mt19937 gen{ static_cast<uint>( throw_seed( seed, pspace.my_rank, sample ) ) };
+        std::normal_distribution<RealType> d{0., pspace.Gauss_covariance};
+        for( uint i = 0; i < state.size(); ++i )
+        {
+            RealType a = d(gen);
+            RealType b = d(gen);
+
+            state[i] = ComplexType{a, b};
+        }
+    }
     return state;
 }
 

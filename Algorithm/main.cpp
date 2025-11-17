@@ -25,7 +25,6 @@ CorrelationTensor correlations_R{my_pspace.symmetry_type, my_pspace.num_TimePoin
 CorrelationTensor correlations_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 RealType Z = RealType{0.};
 auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
-
 my_clock.measure("Initialization");
 
 tmm::Simple_Estimator my_estimator( my_rank, my_pspace.num_Vectors_Per_Core, "typicality sampling" );
@@ -38,6 +37,10 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     CorrelationTensor new_correlations_I(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     // Initialize and thermalize
     State psi_L = func::initialize_state( my_pspace, seed, k ); // |psi_0>
+    if( psi_L == State(my_pspace.HilbertSpaceDimension) ) 
+    {
+        continue;
+    }
     if(my_pspace.beta != RealType{0.})
     {
         func::CET( my_H, psi_L, -my_pspace.beta * RealType{0.5}, depth_beta, "imaginary" ); // e^(-beta*H/2)|psi_0>

@@ -61,6 +61,7 @@ class ParameterSpace
     bool determine_bandwidth;
     RealType E_max;
     RealType E_min;
+    bool full_diagonalization = false;
 
     // PUBLIC METHODS
     void read_SpinSystem();

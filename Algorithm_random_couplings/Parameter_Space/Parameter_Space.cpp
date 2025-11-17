@@ -73,6 +73,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     )(
     "numSpins", bpo::value<uint>()->default_value(uint{16}),
     "set the number of spins in the system"
+    )(
+    "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
+    "set the maximum time for real time evolution"
     );
 
     // ========== general numerical parameters ==========
@@ -87,8 +90,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
     "set the number of time points for the equidistant time discretization"
     )(
-    "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
-    "set the maximum time for real time evolution"
+    "fulldiag", "perform a loop over the whole Hilbert space for exact diagonalization"
     )(
     "GaussCovariance", bpo::value<RealType>()->default_value(RealType{1.0}), 
     "set the covariance of the distribution used to draw random states"
@@ -174,6 +176,11 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
     determine_bandwidth = vm["determine_bandwidth"].as<bool>();
+    if( vm.count("fulldiag") )
+    {
+        full_diagonalization = true;
+        num_Vectors_Per_Core = HilbertSpaceDimension / static_cast<uint>(world_size) + 1;
+    }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();
 

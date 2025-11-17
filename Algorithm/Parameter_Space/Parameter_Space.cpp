@@ -73,6 +73,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "spin_site", bpo::value<uint>()->default_value(uint{0}),
     "set the spin with which the correlations are computed \
     (they look like < S_0^a(t) S_i^b(0) >, where i is spin_site and 0 the first spin in the coupling file)"
+    )(
+    "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
+    "set the maximum time for real time evolution"
     );
 
     // ========== general numerical parameters ==========
@@ -84,14 +87,13 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     "numTimePoints", bpo::value<uint>()->default_value(uint{100}),
     "set the number of time points for the equidistant time discretization"
     )(
-    "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
-    "set the maximum time for real time evolution"
-    )(
     "GaussCovariance", bpo::value<RealType>()->default_value(RealType{1.0}), 
     "set the covariance of the distribution used to draw random states"
     )(
     "numVectorsPerCore", bpo::value<uint>()->default_value(uint{1}),
     "set the number of vectors drawn and averaged over"
+    )(
+    "fulldiag", "perform a loop over the whole Hilbert space for exact diagonalization"
     )(
     "CET_therm_error", bpo::value<RealType>()->default_value(RealType{1e-10}),
     "set the error threshold for thermalization, used to determine the Chebyshev expansion depth"
@@ -172,6 +174,11 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
     determine_bandwidth = vm["determine_bandwidth"].as<bool>();
+    if( vm.count("fulldiag") )
+    {
+        full_diagonalization = true;
+        num_Vectors_Per_Core = HilbertSpaceDimension / static_cast<uint>(world_size) + 1;
+    }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();
 

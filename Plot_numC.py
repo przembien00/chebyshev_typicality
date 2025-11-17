@@ -44,21 +44,20 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_cores = 16
-N_spins = 18
-N_array = np.array( [ 1, 3, 5, 8, 10 ] )
+N_array = np.array( [ 1, 3, 5, 10, 12, 20 ] )
 plt.figure(constrained_layout=True)
-all_conv, times = ImportData(f"NumVec_Random/ISO__Random__beta=1__h_z=2__numConfigs=20__NumVec={N_array[-1]}")
+all_conv, times =  ImportData(f"numCouplings_Random/ISO__Random__beta=1__h_z=2__numConfigs={N_array[-1]}")
 G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][3] )
 G_conv = np.concatenate((G_conv,np.flip(G_conv)))
-plt.plot(times, G_conv, label = rf'NumVec={N_cores*N_array[-1]}')
+plt.plot(times, G_conv, label = rf'numCouplings={N_array[-1]}')
 N_array = N_array[0:-1]
+
 
 sqsums = np.array([])
 
 for n in N_array:
 
-    all, times = ImportData(f"NumVec_Random/ISO__Random__beta=1__h_z=2__numConfigs=20__NumVec={n}")
+    all, times =  ImportData(f"numCouplings_Random/ISO__Random__beta=1__h_z=2__numConfigs={n}")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
@@ -67,7 +66,7 @@ for n in N_array:
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
     # print(np.abs(G_1[-1]))
     G = np.concatenate((G,np.flip(G)))
-    plt.plot(times, G, label = rf'NumVec={N_cores*n}')
+    plt.plot(times, G, label = rf'numCouplings={n}')
     sqsums = np.append(sqsums, np.sum(np.abs(G-G_conv)**2)**0.5/len(G))
 
 
@@ -75,18 +74,18 @@ for n in N_array:
 
 # plt.ylim(0, 0.5)
 plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'g_zz($\tau$)')
+plt.ylabel(r'$g_{zz}$($\tau$)')
 plt.legend()
 
-plt.savefig(f"Plots/Test_NumVec_Random_beta=1_{N_spins}.pdf")
+plt.savefig(f"Plots/Test_numCouplings.pdf")
 plt.clf()
 
-par, cov = curve_fit(F, N_cores*N_array, sqsums)
+par, cov = curve_fit(F, N_array, sqsums)
 print(par[0], cov)
 
 plt.xlabel('N')
 plt.ylabel('error conv')
 # plt.yscale('log')
-plt.loglog(N_cores*N_array, sqsums, 'o')
-plt.loglog(N_cores*N_array, F(N_cores*N_array, par[0]))
-plt.savefig(f"Plots/NumVec_Random_errors_beta=1_{N_spins}.pdf")
+plt.loglog(N_array, sqsums, 'o')
+plt.loglog(N_array, F(N_array, par[0]))
+plt.savefig(f"Plots/numCouplings_errors.pdf")

@@ -68,9 +68,9 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     
     return all, disc 
 
-beta_array = [0.2, 0.6, 0.8, 1]
+beta_array = [0.6, 0.8, 1]
 J_L = 0.0
-h_z =
+h_z = 2.
 foldername = f"Plots/Random_h_z={h_z:.1g}/"
 
 markers = ['v', '^', 's', 'x', 'D', '+']
@@ -83,7 +83,7 @@ for beta in beta_array:
 
     # all, times = ImportData(f"Mag_Field/ISO__Square_NN_PBC_N=20__beta={beta:.2g}__h_z=2__rescale=0.5")
     all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}__h=z_h_abs={h_z:.1g}", project="spinDMFT", extension="")
-    all, times =  ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__h_z={h_z:.1g}__numConfigs=20")
+    all, times =  ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__h_z={h_z:.1g}__numConfigs=30")
     Re_G = np.array( [ gab for gab in all['results']['Re_correlation']] )
     Im_G = np.array( [ gab for gab in all['results']['Im_correlation']] )
     Re_G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']] )
