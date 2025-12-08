@@ -22,7 +22,10 @@ print::print_R0( my_rank, "+++++++++++++++++++++++++++++++++++++++++++++++++++++
 size_t seed = func::generate_seed( my_pspace, my_rank );
 CorrelationTensor averaged_correlations_R( my_pspace.symmetry_type, my_pspace.num_TimePoints );
 CorrelationTensor averaged_correlations_I( my_pspace.symmetry_type, my_pspace.num_TimePoints );
+CorrelationTensor sqsum_R( my_pspace.symmetry_type, my_pspace.num_TimePoints );
+CorrelationTensor sqsum_I( my_pspace.symmetry_type, my_pspace.num_TimePoints );
 my_clock.measure("Initialization");
+
 for( int i=0; i<my_pspace.num_Coupling_Configs; i++ )
 {
 my_pspace.draw_couplings( seed, i );
@@ -73,15 +76,20 @@ func::normalize( Z, correlations_R );
 func::normalize( Z, correlations_I );
 averaged_correlations_R += correlations_R;
 averaged_correlations_I += correlations_I;
+func::add_sqs( correlations_R, correlations_I, sqsum_R, sqsum_I );
 }
 RealType N = static_cast<RealType>(my_pspace.num_Coupling_Configs);
+
+CorrelationTensor stds_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor stds_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+func::compute_stds( N, averaged_correlations_R, averaged_correlations_I, sqsum_R, sqsum_I, stds_R, stds_I );
 func::normalize( N, averaged_correlations_R );
 func::normalize( N, averaged_correlations_I );
 my_clock.measure("Correlations");
 
 // Store correlations
 stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
-my_data_storage.store_main( my_pspace, averaged_correlations_R, averaged_correlations_I );
+my_data_storage.store_main( my_pspace, averaged_correlations_R, averaged_correlations_I, stds_R, stds_I );
 my_data_storage.finalize();
 my_clock.measure("Saving");
 my_clock.finalize();

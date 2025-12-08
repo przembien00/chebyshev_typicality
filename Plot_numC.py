@@ -44,9 +44,11 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_array = np.array( [ 1, 3, 5, 10, 12, 20 ] )
+N = 12
+# N_array = np.array( [ 3, 6, 9, 12, 15, 18 ] )
+N_array = np.array( [50, 100, 200, 250, 300 ] )
 plt.figure(constrained_layout=True)
-all_conv, times =  ImportData(f"numCouplings_Random/ISO__Random__beta=1__h_z=2__numConfigs={N_array[-1]}")
+all_conv, times =  ImportData(f"numCouplings_Random/ISO__Random__N={N}__beta=1__h_z=2__numConfigs={N_array[-1]}")
 G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][3] )
 G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 plt.plot(times, G_conv, label = rf'numCouplings={N_array[-1]}')
@@ -57,7 +59,7 @@ sqsums = np.array([])
 
 for n in N_array:
 
-    all, times =  ImportData(f"numCouplings_Random/ISO__Random__beta=1__h_z=2__numConfigs={n}")
+    all, times =  ImportData(f"NumCouplings_Random/ISO__Random__N={N}__beta=1__h_z=2__numConfigs={n}")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
@@ -72,12 +74,13 @@ for n in N_array:
 
 # plt.plot(times_ed, G_ed, 'b--', label = rf'ED')
 
-# plt.ylim(0, 0.5)
+plt.xlim(0, 1)
+plt.ylim(0.2425, 0.2504)
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{zz}$($\tau$)')
 plt.legend()
 
-plt.savefig(f"Plots/Test_numCouplings.pdf")
+plt.savefig(f"Plots/Test_numCouplings_{N}.pdf")
 plt.clf()
 
 par, cov = curve_fit(F, N_array, sqsums)
@@ -88,4 +91,4 @@ plt.ylabel('error conv')
 # plt.yscale('log')
 plt.loglog(N_array, sqsums, 'o')
 plt.loglog(N_array, F(N_array, par[0]))
-plt.savefig(f"Plots/numCouplings_errors.pdf")
+plt.savefig(f"Plots/numCouplings_{N}_errors.pdf")

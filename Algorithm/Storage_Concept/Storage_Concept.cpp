@@ -110,7 +110,7 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
 }
 
 
-void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im )
+void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im, const CorrelationTensor& stds_Re, const CorrelationTensor& stds_Im )
 {
     if( !m_storing_permission ){ return; } // permission request
 
@@ -145,6 +145,8 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
     
     store_correlation_tensor( corr_Re, m_results_group_id, "Re_correlation", "Real part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
     store_correlation_tensor( corr_Im, m_results_group_id, "Im_correlation", "Imaginary part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
+    store_correlation_tensor( stds_Re, m_results_group_id, "Re_stds", "Standard deviations of the real part of correlations, stored according to the hierarchy alpha-beta, t" );
+    store_correlation_tensor( stds_Im, m_results_group_id, "Im_stds", "Standard deviations of the imaginary part of correlations, stored according to the hierarchy alpha-beta, t" );
 
     H5Gclose( m_results_group_id );
 }

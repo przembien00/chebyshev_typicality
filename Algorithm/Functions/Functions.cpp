@@ -125,7 +125,7 @@ State S_alpha_i_act( const State& state, const long site, char alpha )
     }
 }
 
-void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im )
+void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im, CorrelationTensor& corrs_Re_sq, CorrelationTensor& corrs_Im_sq )
 {
     ComplexType c;
     switch( pspace.symmetry_type )
@@ -134,64 +134,96 @@ void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace
         {
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
             corrs_Re(2,2)[t] = std::real(c);
+            corrs_Re_sq(2,2)[t] = std::real(c)*std::real(c);
             corrs_Im(2,2)[t] = std::imag(c);
+            corrs_Im_sq(2,2)[t] = std::imag(c)*std::imag(c);
             break;
         }
         case 'B':
         {
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
             corrs_Re(0,0)[t] = std::real(c);
+            corrs_Re_sq(0,0)[t] = std::real(c)*std::real(c);
             corrs_Im(0,0)[t] = std::imag(c);
+            corrs_Im_sq(0,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
             corrs_Re(2,2)[t] = std::real(c);
+            corrs_Re_sq(2,2)[t] = std::real(c)*std::real(c);
             corrs_Im(2,2)[t] = std::imag(c);
+            corrs_Im_sq(2,2)[t] = std::imag(c)*std::imag(c);
             break;
         }
         case 'C':
         {
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
             corrs_Re(0,0)[t] = std::real(c);
+            corrs_Re_sq(0,0)[t] = std::real(c)*std::real(c);
             corrs_Im(0,0)[t] = std::imag(c);
+            corrs_Im_sq(0,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
             corrs_Re(1,0)[t] = std::real(c);
+            corrs_Re_sq(1,0)[t] = std::real(c)*std::real(c);
             corrs_Im(1,0)[t] = std::imag(c);
+            corrs_Im_sq(1,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
             corrs_Re(0,1)[t] = std::real(c);
+            corrs_Re_sq(0,1)[t] = std::real(c)*std::real(c);
             corrs_Im(0,1)[t] = std::imag(c);
+            corrs_Im_sq(0,1)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
             corrs_Re(2,2)[t] = std::real(c);
+            corrs_Re_sq(2,2)[t] = std::real(c)*std::real(c);
             corrs_Im(2,2)[t] = std::imag(c);
+            corrs_Im_sq(2,2)[t] = std::imag(c)*std::imag(c);
             break;
         }
         case 'D':
         {
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'x' ) );
             corrs_Re(0,0)[t] = std::real(c);
+            corrs_Re_sq(0,0)[t] = std::real(c)*std::real(c);
             corrs_Im(0,0)[t] = std::imag(c);
+            corrs_Im_sq(0,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'x' ) );
             corrs_Re(0,1)[t] = std::real(c);
+            corrs_Re_sq(0,1)[t] = std::real(c)*std::real(c);
             corrs_Im(0,1)[t] = std::imag(c);
+            corrs_Im_sq(0,1)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'x' ) );
             corrs_Re(0,2)[t] = std::real(c);
+            corrs_Re_sq(0,2)[t] = std::real(c)*std::real(c);
             corrs_Im(0,2)[t] = std::imag(c);
+            corrs_Im_sq(0,2)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'y' ) );
             corrs_Re(1,0)[t] = std::real(c);
+            corrs_Re_sq(1,0)[t] = std::real(c)*std::real(c);
             corrs_Im(1,0)[t] = std::imag(c);
+            corrs_Im_sq(1,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'y' ) );
             corrs_Re(1,1)[t] = std::real(c);
+            corrs_Re_sq(1,1)[t] = std::real(c)*std::real(c);
             corrs_Im(1,1)[t] = std::imag(c);
+            corrs_Im_sq(1,1)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'y' ) );
             corrs_Re(1,2)[t] = std::real(c);
+            corrs_Re_sq(1,2)[t] = std::real(c)*std::real(c);
             corrs_Im(1,2)[t] = std::imag(c);
+            corrs_Im_sq(1,2)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[0], site, 'z' ) );
             corrs_Re(2,0)[t] = std::real(c);
+            corrs_Re_sq(2,0)[t] = std::real(c)*std::real(c);
             corrs_Im(2,0)[t] = std::imag(c);
+            corrs_Im_sq(2,0)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[1], site, 'z' ) );
             corrs_Re(2,1)[t] = std::real(c);
+            corrs_Re_sq(2,1)[t] = std::real(c)*std::real(c);
             corrs_Im(2,1)[t] = std::imag(c);
+            corrs_Im_sq(2,1)[t] = std::imag(c)*std::imag(c);
             c = cdot( psi_L, S_alpha_i_act( v_psi_R[2], site, 'z' ) );
             corrs_Re(2,2)[t] = std::real(c);
+            corrs_Re_sq(2,2)[t] = std::real(c)*std::real(c);
             corrs_Im(2,2)[t] = std::imag(c);
+            corrs_Im_sq(2,2)[t] = std::imag(c)*std::imag(c);
             break;
         }
     }
@@ -300,7 +332,7 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::
     state = state_final;
 }
 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im )
+void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq )
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce
 {
     // share correlation results
@@ -312,6 +344,20 @@ void MPI_share_results( RealType& partition_function, CorrelationTensor& correla
     } );
 
     std::for_each( correlations_Im.begin(), correlations_Im.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Re_sq.begin(), correlations_Re_sq.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Im_sq.begin(), correlations_Im_sq.end(), []( CorrelationVector& spin_c ) 
     {
         std::vector<RealType> rcv_buf( spin_c.size() ); 
         MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
@@ -332,5 +378,30 @@ void normalize( RealType& partition_function, CorrelationTensor& correlations )
         spin_c *= RealType{1.0}/partition_function; 
     } );
 }
+
+void compute_stds( ps::ParameterSpace& pspace, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq, CorrelationTensor& Re_stds, CorrelationTensor& Im_stds )
+{
+    RealType M = static_cast<RealType>( pspace.num_Vectors_Per_Core * pspace.world_size );
+    std::transform( correlations_Re.cbegin(), correlations_Re.cend(), correlations_Re_sq.cbegin(), Re_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
+        {
+            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+        } );
+        return std_C;
+    } );
+
+    std::transform( correlations_Im.cbegin(), correlations_Im.cend(), correlations_Im_sq.cbegin(), Im_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
+        {
+            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+        } );
+        return std_C;
+    } );
+}
+
 
 }

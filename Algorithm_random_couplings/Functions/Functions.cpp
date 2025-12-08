@@ -333,4 +333,50 @@ void normalize( RealType& partition_function, CorrelationTensor& correlations )
     } );
 }
 
+void add_sqs( const CorrelationTensor& correlations_Re, const CorrelationTensor& correlations_Im, CorrelationTensor& sqsum_Re, CorrelationTensor& sqsum_Im )
+{
+    std::transform( correlations_Re.cbegin(), correlations_Re.cend(), sqsum_Re.begin(), sqsum_Re.begin(), [&]( const CorrelationVector& sample_C, CorrelationVector& sample_sqsum_C  )
+    {
+        CorrelationVector sqsum_C( sample_sqsum_C.size() );
+        std::transform( sample_C.cbegin(), sample_C.cend(), sample_sqsum_C.begin(), sqsum_C.begin(), [&]( const auto& sample, auto& sample_sqsum )
+        {
+            return sample_sqsum + std::pow( sample, 2 );
+        } );
+        return sqsum_C;
+    } );
+
+    std::transform( correlations_Im.cbegin(), correlations_Im.cend(), sqsum_Im.begin(), sqsum_Im.begin(), [&]( const CorrelationVector& sample_C, CorrelationVector& sample_sqsum_C  )
+    {
+        CorrelationVector sqsum_C( sample_sqsum_C.size() );
+        std::transform( sample_C.cbegin(), sample_C.cend(), sample_sqsum_C.cbegin(), sqsum_C.begin(), [&]( const auto& sample, auto& sample_sqsum )
+        {
+            return sample_sqsum + std::pow( sample, 2 );
+        } );
+        return sqsum_C;
+    } );
+}
+
+void compute_stds( RealType M, const CorrelationTensor& correlations_Re, const CorrelationTensor& correlations_Im, const CorrelationTensor& sqsum_Re, const CorrelationTensor& sqsum_Im, CorrelationTensor& stds_Re, CorrelationTensor& stds_Im )
+{
+    std::transform( correlations_Re.cbegin(), correlations_Re.cend(), sqsum_Re.cbegin(), stds_Re.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
+        {
+            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+        } );
+        return std_C;
+    } );
+
+    std::transform( correlations_Im.cbegin(), correlations_Im.cend(), sqsum_Im.cbegin(), stds_Im.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
+        {
+            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+        } );
+        return std_C;
+    } );
+}
+
 }

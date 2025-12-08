@@ -38,4 +38,8 @@ void MPI_share_results( RealType& partition_function, CorrelationTensor& correla
 
 void normalize( RealType& partition_function, CorrelationTensor& spin_c );
 
+void add_sqs( const CorrelationTensor& correlations_Re, const CorrelationTensor& correlations_Im, CorrelationTensor& sqsum_Re, CorrelationTensor& sqsum_Im );
+
+void compute_stds( RealType M, const CorrelationTensor& correlations_Re, const CorrelationTensor& correlations_Im, const CorrelationTensor& sqsum_Re, const CorrelationTensor& sqsum_Im, CorrelationTensor& stds_Re, CorrelationTensor& stds_Im );
+
 }

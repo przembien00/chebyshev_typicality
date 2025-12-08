@@ -23,6 +23,8 @@ ham::Hamiltonian my_H( my_pspace );
 size_t seed = func::generate_seed( my_pspace, my_rank );
 CorrelationTensor correlations_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 CorrelationTensor correlations_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor correlations_R_sq{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor correlations_I_sq{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 RealType Z = RealType{0.};
 auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
 my_clock.measure("Initialization");
@@ -35,6 +37,8 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 {
     CorrelationTensor new_correlations_R(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     CorrelationTensor new_correlations_I(my_pspace.symmetry_type, my_pspace.num_TimePoints);
+    CorrelationTensor new_correlations_R_sq(my_pspace.symmetry_type, my_pspace.num_TimePoints);
+    CorrelationTensor new_correlations_I_sq(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     // Initialize and thermalize
     State psi_L = func::initialize_state( my_pspace, seed, k ); // |psi_0>
     if( psi_L == State(my_pspace.HilbertSpaceDimension) ) 
@@ -49,7 +53,7 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     // Evolve: loop over times
 
     States v_psi_R = func::S_i_act( my_pspace, psi_L, my_pspace.spin_site ); // S^a_0 e^(-beta*H/2)|psi_0>
-    func::compute_correlations_at( 0, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I );
+    func::compute_correlations_at( 0, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I, new_correlations_R_sq, new_correlations_I_sq );
     for( uint t_point = 1; t_point < my_pspace.num_TimePoints; t_point++ )
     {
         std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &my_pspace, &depth_dt]( State& psi_R )
@@ -57,21 +61,29 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
         func::CET( my_H, psi_R, -my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
         } );
         func::CET( my_H, psi_L, my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(tau H) e^(-beta H/2)|psi_0>
-        func::compute_correlations_at( t_point, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_0 e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
+        func::compute_correlations_at( t_point, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I, new_correlations_R_sq, new_correlations_I_sq ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_0 e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
     }
     correlations_R += new_correlations_R;
     correlations_I += new_correlations_I;
+    correlations_R_sq += new_correlations_R_sq;
+    correlations_I_sq += new_correlations_I_sq;
     my_estimator.estimate(k);
 }
 my_estimator.leave_loop();
-func::MPI_share_results( Z, correlations_R, correlations_I );
+func::MPI_share_results( Z, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq );
 func::normalize( Z, correlations_R );
 func::normalize( Z, correlations_I );
+RealType Z2 = Z * Z;
+func::normalize( Z2, correlations_R_sq );
+func::normalize( Z2, correlations_I_sq );
+CorrelationTensor stds_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor stds_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+func::compute_stds( my_pspace, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq, stds_R, stds_I );
 my_clock.measure("Correlations");
 
 // Store correlations
 stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
-my_data_storage.store_main( my_pspace, correlations_R, correlations_I );
+my_data_storage.store_main( my_pspace, correlations_R, correlations_I, stds_R, stds_I );
 my_data_storage.finalize();
 my_clock.measure("Saving");
 my_clock.finalize();
