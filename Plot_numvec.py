@@ -44,12 +44,12 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-N_cores = 16
-N_spins = 18
-N_array = np.array( [ 1, 3, 5, 8, 10 ] )
+N_cores = 4
+N_spins = 20
+N_array = np.array( [ 1, 3, 5, 10, 12, 25, 37, 50, 75, 100 ] )
 plt.figure(constrained_layout=True)
-all_conv, times = ImportData(f"NumVec_Random/ISO__Random__beta=1__h_z=2__numConfigs=20__NumVec={N_array[-1]}")
-G_conv = np.array( [ gab for gab in all_conv['results']['Re_correlation']][3] )
+all_conv, times = ImportData(f"NumVec/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={N_array[-1]}")
+G_conv = np.array( [ gab for gab in all_conv['results']['g_zz']] )
 G_conv = np.concatenate((G_conv,np.flip(G_conv)))
 plt.plot(times, G_conv, label = rf'NumVec={N_cores*N_array[-1]}')
 N_array = N_array[0:-1]
@@ -58,11 +58,11 @@ sqsums = np.array([])
 
 for n in N_array:
 
-    all, times = ImportData(f"NumVec_Random/ISO__Random__beta=1__h_z=2__numConfigs=20__NumVec={n}")
+    all, times = ImportData(f"NumVec/ISO__Square_NN_PBC_N={N_spins}__beta=1__rescale=0.5__numVecPerCore={n}")
 
     # all_ed, times_ed =  ImportData_ED("ISO_Square_NN_PBC_N=16__ISO_Disordered_Blockwise__rescale=0.5_1_5")
 
-    G = np.array( [ gab for gab in all['results']['Re_correlation']][3] )
+    G = np.array( [ gab for gab in all['results']['g_zz']] )
     # print(G_1[-1])
     # G_ed = np.array( [ gab for gab in all_ed['results'][f'1.00']['fluctuation']][0] )
     # print(np.abs(G_1[-1]))

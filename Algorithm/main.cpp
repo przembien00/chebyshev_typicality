@@ -25,7 +25,10 @@ CorrelationTensor correlations_R{my_pspace.symmetry_type, my_pspace.num_TimePoin
 CorrelationTensor correlations_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 CorrelationTensor correlations_R_sq{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 CorrelationTensor correlations_I_sq{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor covariances_Z_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
+CorrelationTensor covariances_Z_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 RealType Z = RealType{0.};
+RealType Z_sq = RealType{0.};
 auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
 my_clock.measure("Initialization");
 
@@ -49,7 +52,9 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     {
         func::CET( my_H, psi_L, -my_pspace.beta * RealType{0.5}, depth_beta, "imaginary" ); // e^(-beta*H/2)|psi_0>
     }
-    Z += std::pow( std::real(blaze::norm(psi_L)) , 2 ); // Z = <psi_0|e^(-beta*H)|psi_0>
+    RealType Z_sample  = std::pow( std::real(blaze::norm(psi_L)) , 2 );
+    Z += Z_sample; // Z = <psi_0|e^(-beta*H)|psi_0>
+    Z_sq += std::pow( Z_sample , 2 ); // for stds
     // Evolve: loop over times
 
     States v_psi_R = func::S_i_act( my_pspace, psi_L, my_pspace.spin_site ); // S^a_0 e^(-beta*H/2)|psi_0>
@@ -65,20 +70,19 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     }
     correlations_R += new_correlations_R;
     correlations_I += new_correlations_I;
+    covariances_Z_R += Z_sample * new_correlations_R;
+    covariances_Z_I += Z_sample * new_correlations_I;
     correlations_R_sq += new_correlations_R_sq;
     correlations_I_sq += new_correlations_I_sq;
     my_estimator.estimate(k);
 }
 my_estimator.leave_loop();
-func::MPI_share_results( Z, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq );
+func::MPI_share_results( Z, Z_sq, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq, covariances_Z_R, covariances_Z_I );
 func::normalize( Z, correlations_R );
 func::normalize( Z, correlations_I );
-RealType Z2 = Z * Z;
-func::normalize( Z2, correlations_R_sq );
-func::normalize( Z2, correlations_I_sq );
 CorrelationTensor stds_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 CorrelationTensor stds_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
-func::compute_stds( my_pspace, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq, stds_R, stds_I );
+func::compute_stds( my_pspace, Z, Z_sq, correlations_R, correlations_I, correlations_R_sq, correlations_I_sq, covariances_Z_R, covariances_Z_I, stds_R, stds_I );
 my_clock.measure("Correlations");
 
 // Store correlations

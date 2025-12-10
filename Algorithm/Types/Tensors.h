@@ -5,6 +5,7 @@
 #include<iostream>
 #include<functional>
 #include<type_traits>
+#include"Types.h"
 #include"../cpp_libs/O_Error_Handling.h"
 
 namespace Tensors
@@ -102,10 +103,14 @@ using constIt = typename std::vector<Correlation>::const_iterator;
     Correlation& operator()( const uint a, const uint b );
     Correlation operator()( const uint a, const uint b ) const;
     CorrelationTensor& operator+=(const CorrelationTensor& other);
+    // template<typename Correlation2, typename Scalar>
+    // friend CorrelationTensor<Correlation2> operator*(const CorrelationTensor<Correlation2>& tensor, const Scalar& s);
+
 
     // FRIENDS
     template<typename Correlation2>
     friend std::ostream& operator<<( std::ostream& os, const CorrelationTensor<Correlation2>& tensor );
+
 
  private:
     // PRIVATE MEMBERS
@@ -205,6 +210,16 @@ std::ostream& operator<<( std::ostream& os, const CorrelationTensor<Correlation2
             error::SYMMETRY_TYPE( tensor.m_symmetry_type, __PRETTY_FUNCTION__ );
     }
     return os;
+}
+
+// scalar multiplication (tensor * scalar)
+template<typename Correlation, typename Scalar>
+CorrelationTensor<Correlation> operator*(const Scalar& s, const CorrelationTensor<Correlation>& tensor)
+{
+    CorrelationTensor<Correlation> out = tensor; // copy
+    std::transform(out.cbegin(), out.cend(), out.begin(),
+                   [&s](const Correlation& c)->Correlation { return s * c; });
+    return out;
 }
 
 
@@ -498,6 +513,7 @@ CorrelationTensor<Correlation>& CorrelationTensor<Correlation>::operator+=(const
         [](Correlation& c1, const Correlation& c2){ return c1 + c2; } );
     return *this;
 }
+
 
 // Get Functions
 template<typename Correlation>

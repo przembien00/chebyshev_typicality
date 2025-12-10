@@ -68,7 +68,7 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     
     return all, disc 
 
-beta_array = [0.2, 0.6, 0.8, 1]
+beta_array = [0.2, 1]
 
 sqsums = np.array([])
 
@@ -79,23 +79,27 @@ markers = ['v', '^', 's', 'x', 'D', '+']
 i=0
 for beta in beta_array:
     # all, times = ImportData(f"Curie_Weiss/ISO__CW_N=20__beta={beta:.2g}")
-    all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=20")
-    if beta==1:
-        all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=40")
+    # all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=20")
+    # if beta==1:
+    #     all, times = ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__numConfigs=40")
+    all, times = ImportData(f"ISO__Square_NN_PBC_N=16__beta={beta}__rescale=0.5X")
     all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}", project="spinDMFT", extension="")
     G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
+    G_err = np.array( [ gab for gab in all['results']['Re_stds']][0] )
     G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']][0] )
     G = np.concatenate((G,np.flip(G)))
-    
+    print(G_err)
+    G_err = np.concatenate((G_err,np.flip(G_err)))
+
     plt.plot(times_sdmft, G_sdmft, label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
-    plt.plot(times, G, '--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
+    plt.errorbar(times, G, yerr=G_err, label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
     i+=1
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')
 plt.xlim(0, 1)
 plt.legend(fontsize=7)
-plt.savefig("Plots/spinDMFT_vs_Random.pdf", dpi=1000)
+plt.savefig("Plots/spinDMFT_errbar.pdf", dpi=1000)
 plt.clf()
 # plt.plot(beta_array, sqsums, 'o')
 # plt.yscale('log')

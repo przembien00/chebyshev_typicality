@@ -332,7 +332,10 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::
     state = state_final;
 }
 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq )
+void MPI_share_results( RealType& partition_function, RealType& partition_function_sq,
+                        CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, 
+                        CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                        CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z )
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce
 {
     // share correlation results
@@ -364,11 +367,28 @@ void MPI_share_results( RealType& partition_function, CorrelationTensor& correla
         spin_c = rcv_buf;
     } );
 
+    std::for_each( covariances_Re_Z.begin(), covariances_Re_Z.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( covariances_Im_Z.begin(), covariances_Im_Z.end(), []( CorrelationVector& spin_c ) 
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
     // share partition function results
     std::vector<RealType> send_buf = { partition_function };
     std::vector<RealType> receive_buf( 1 );
     MPI_Allreduce( send_buf.data(), receive_buf.data(), 1, MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
     partition_function = receive_buf.at(0);
+    send_buf = { partition_function_sq };
+    MPI_Allreduce( send_buf.data(), receive_buf.data(), 1, MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+    partition_function_sq = receive_buf.at(0);
 }
 
 void normalize( RealType& partition_function, CorrelationTensor& correlations )
@@ -379,29 +399,46 @@ void normalize( RealType& partition_function, CorrelationTensor& correlations )
     } );
 }
 
-void compute_stds( ps::ParameterSpace& pspace, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq, CorrelationTensor& Re_stds, CorrelationTensor& Im_stds )
+template <class InputIterator1, class InputIterator2, class InputIterator3,
+          class OutputIterator, class TrenaryOperation>
+  OutputIterator transform3(InputIterator1 first1, InputIterator1 last1,
+                            InputIterator2 first2, InputIterator3 first3, OutputIterator result,
+                            TrenaryOperation trenary_op)
 {
-    RealType M = static_cast<RealType>( pspace.num_Vectors_Per_Core * pspace.world_size );
-    std::transform( correlations_Re.cbegin(), correlations_Re.cend(), correlations_Re_sq.cbegin(), Re_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
-    {
-        CorrelationVector std_C( sample_sum_C.size() );
-        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
-        {
-            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
-        } );
-        return std_C;
-    } );
-
-    std::transform( correlations_Im.cbegin(), correlations_Im.cend(), correlations_Im_sq.cbegin(), Im_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C )
-    {
-        CorrelationVector std_C( sample_sum_C.size() );
-        std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
-        {
-            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
-        } );
-        return std_C;
-    } );
+  while (first1 != last1) {
+    *result = trenary_op(*first1, *first2, *first3);
+    ++result; ++first1; ++first2; ++first3;
+  }
+  return result;
 }
 
+void compute_stds( ps::ParameterSpace& pspace, RealType& Z, RealType& Z_sq, 
+                    CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im,
+                    CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                    CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z, 
+                    CorrelationTensor& Re_stds, CorrelationTensor& Im_stds )
+{
+    RealType M = static_cast<RealType>( pspace.num_Vectors_Per_Core * pspace.world_size );
+    transform3( correlations_Re.cbegin(), correlations_Re.cend(), correlations_Re_sq.cbegin(), covariances_Re_Z.cbegin(), Re_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C, const CorrelationVector& sample_cov_CZ )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        transform3( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), sample_cov_CZ.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum, const auto& sample_cov )
+        {
+            return std::sqrt(std::abs( sample_sqsum + std::pow(sample_sum,2)*Z_sq - 2 * sample_sum * sample_cov ) / std::pow(Z,2));
+        } );
+        return std_C;
+    } );
+
+    transform3( correlations_Im.cbegin(), correlations_Im.cend(), correlations_Im_sq.cbegin(), covariances_Im_Z.cbegin(), Im_stds.begin(), [&]( const CorrelationVector& sample_sum_C, const CorrelationVector& sample_sqsum_C, const CorrelationVector& sample_cov_CZ )
+    {
+        CorrelationVector std_C( sample_sum_C.size() );
+        transform3( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), sample_cov_CZ.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum, const auto& sample_cov )
+        {
+            return std::sqrt(std::abs( sample_sqsum + std::pow(sample_sum,2)*Z_sq - 2 * sample_sum * sample_cov ) / std::pow(Z,2));
+        } );
+        return std_C;
+    } );
+
+}
 
 }

@@ -34,11 +34,17 @@ States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site 
 
 void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type );
 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq );
+void MPI_share_results( RealType& partition_function, RealType& partition_function_sq,
+                        CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, 
+                        CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                        CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z );
 
 void normalize( RealType& partition_function, CorrelationTensor& spin_c );
 
-void compute_stds( ps::ParameterSpace& pspace, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq, CorrelationTensor& Re_stds, CorrelationTensor& Im_stds );
-
+void compute_stds( ps::ParameterSpace& pspace, RealType& Z, RealType& Z_sq, 
+                    CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im,
+                    CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                    CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z, 
+                    CorrelationTensor& Re_stds, CorrelationTensor& Im_stds );
 
 }

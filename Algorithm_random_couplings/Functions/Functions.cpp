@@ -363,7 +363,7 @@ void compute_stds( RealType M, const CorrelationTensor& correlations_Re, const C
         CorrelationVector std_C( sample_sum_C.size() );
         std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
         {
-            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+            return std::sqrt( std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ) / M );
         } );
         return std_C;
     } );
@@ -373,7 +373,7 @@ void compute_stds( RealType M, const CorrelationTensor& correlations_Re, const C
         CorrelationVector std_C( sample_sum_C.size() );
         std::transform( sample_sum_C.cbegin(), sample_sum_C.cend(), sample_sqsum_C.cbegin(), std_C.begin(), [&]( const auto& sample_sum, const auto& sample_sqsum )
         {
-            return std::sqrt(std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ));
+            return std::sqrt( std::abs(  sample_sqsum / M - std::pow( sample_sum / M, 2 )  ) / M );
         } );
         return std_C;
     } );
