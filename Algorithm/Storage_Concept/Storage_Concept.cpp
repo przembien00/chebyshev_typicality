@@ -133,6 +133,7 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
     hdf5r::store_scalar( ps_group_id, "num_TimePoints",               pspace.num_TimePoints ); 
     hdf5r::store_scalar( ps_group_id, "delta_t",                  pspace.dt );
     hdf5r::store_scalar( ps_group_id, "num_Cores", pspace.world_size);
+    hdf5r::store_scalar( ps_group_id, "num_Vectors_Per_Core",    pspace.num_Vectors_Per_Core );
     hdf5r::store_scalar( ps_group_id, "E_max", pspace.E_max );
     hdf5r::store_scalar( ps_group_id, "E_min", pspace.E_min );
 
