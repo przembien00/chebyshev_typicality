@@ -92,9 +92,9 @@ for beta in beta_array:
     G_FM = np.concatenate((G_FM,np.flip(G_FM)))
     G_AFM = np.concatenate((G_AFM,np.flip(G_AFM)))
     
-    ax.plot(times_sdmft, G_sdmft, label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], color='green', markevery=25)
-    ax.plot(times, G_FM, label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], color='dodgerblue', markevery=25)
-    ax.plot(times, G_AFM, label = rf'Chebyshev AFM, $\beta J_Q$={beta:.2g}', marker=markers[i], color='crimson', markevery=25)
+    ax.plot(times_sdmft, G_sdmft, label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], color='forestgreen', markevery=25)
+    ax.plot(times, G_FM, '--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], color='blue', markevery=25)
+    ax.plot(times, G_AFM, '--', label = rf'Chebyshev AFM, $\beta J_Q$={beta:.2g}', marker=markers[i], color='crimson', markevery=25)
     i+=1
 
 ax.set_xlabel(r'$\tau$/$\beta$')

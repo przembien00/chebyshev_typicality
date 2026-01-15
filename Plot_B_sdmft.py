@@ -68,10 +68,10 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     
     return all, disc 
 
-beta_array = [0.2, 0.6, 0.8, 1]
+beta_array = [0.2, 0.6, 1, 1.5]
 J_L = 2.6833
 h_z = 0.5
-foldername = f"Plots/Frustrated_h_z={h_z:.1g}/"
+foldername = f"Plots/Random_h_z={h_z:.1g}/"
 
 markers = ['v', '^', 's', 'x', 'D', '+']
 fig_xx, ax_xx = plt.subplots()
@@ -81,23 +81,27 @@ fig_zz, ax_zz = plt.subplots()
 i=0
 for beta in beta_array:
 
-    all, times = ImportData(f"Mag_Field/ISO__Square_Frustrated_PBC_N=18__beta={beta:.2g}__h_z={h_z:.1g}__rescale=0.447214")
-    all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"JL={J_L}__beta={beta:.2g}__h=z_h_abs={h_z:.1g}", project="spinDMFT", extension="")
-    # all, times =  ImportData(f"Random_Couplings/ISO__Random__beta={beta:.2g}__h_z={h_z:.1g}__numConfigs=20")
+    all, times = ImportData(f"Random_Couplings/ISO__Random__N=13__beta={beta:.2g}__h_z={h_z:.1g}__numConfigs=50")
+    all_sdmft, times_sdmft = ImportData_spinDMFT("ISO", physical_data=f"beta={beta:.2g}__h=z_h_abs={h_z:.1g}", project="spinDMFT", extension="")
     Re_G = np.array( [ gab for gab in all['results']['Re_correlation']] )
     Im_G = np.array( [ gab for gab in all['results']['Im_correlation']] )
+    Re_G_err = np.array( [ gab for gab in all['results']['Re_stddev']] )
+    Im_G_err = np.array( [ gab for gab in all['results']['Im_stddev']] )
     Re_G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Re_correlation']] )
     Im_G_sdmft = np.array( [ gab for gab in all_sdmft['results']['Im_correlation']] )
     G_xx = np.concatenate((Re_G[0],np.flip(Re_G[0])))
+    G_xx_err = np.concatenate((Re_G_err[0],np.flip(Re_G_err[0])))
     G_zz = np.concatenate((Re_G[3],np.flip(Re_G[3])))
+    G_zz_err = np.concatenate((Re_G_err[3],np.flip(Re_G_err[3])))
     G_xy = np.concatenate((Im_G[1],-np.flip(Im_G[1])))
+    G_xy_err = np.concatenate((Im_G_err[1],np.flip(Im_G_err[1])))
     
     ax_xx.plot(times_sdmft, Re_G_sdmft[0], label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
-    ax_xx.plot(times, G_xx, '--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
+    ax_xx.errorbar(times, G_xx, yerr=G_xx_err, ls='--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
     ax_xy.plot(times_sdmft, Im_G_sdmft[1], label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
-    ax_xy.plot(times, G_xy, '--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
+    ax_xy.errorbar(times, G_xy, yerr=G_xy_err, ls='--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
     ax_zz.plot(times_sdmft, Re_G_sdmft[3], label = rf'spinDMFT, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
-    ax_zz.plot(times, G_zz, '--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
+    ax_zz.errorbar(times, G_zz, yerr=G_zz_err, ls='--', label = rf'Chebyshev, $\beta J_Q$={beta:.2g}', marker=markers[i], markevery=25)
     i+=1
 
 for ax in [ax_xx, ax_xy, ax_zz]:
