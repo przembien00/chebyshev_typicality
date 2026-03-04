@@ -42,16 +42,17 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-beta_array = [0.2, 0.6, 0.8, 1.]
+beta_array = [0.5, 1., 1.5, 2.]
 
 for beta in beta_array:
 
-    all_1, times = ImportData(f"Test/ISO__Square_NN_PBC_N=16__beta={beta:.2g}__h_z=2__rescale=-0.5")
+    all, times = ImportData(f"ISO__Square_NN_PBC_N=20__beta={beta:.2g}__h_z=0.5__rescale=-0.5")
 
-    G_1 = np.array( [ gab for gab in all_1['results']['Re_correlation']][3] )
-    # print(np.abs(G_ed[-1]-G_1[-1]))
-    G_1 = np.concatenate((G_1,np.flip(G_1)))
-    plt.plot(times, G_1, label=rf'CET N=24, $\beta={beta:.2g}$')
+    G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
+    G_err = np.array( [ gab for gab in all['results']['Re_stds']][0] )
+    G = np.concatenate((G,np.flip(G)))
+    G_err = np.concatenate((G_err,np.flip(G_err)))
+    plt.errorbar(times, G, yerr=G_err, label=rf'CET N=20, $\beta={beta:.2g}$')
 
 plt.xlabel(r'$\tau$/$\beta$')
 plt.ylabel(r'$g_{xx}$($\tau$)')

@@ -41,29 +41,39 @@ def ImportData_ED(physical_data, project_name = ""):
 
     return all, disc
 
-site_array = [1, 2, 6]
+N_array = np.array([9, 10, 11, 12, 13])
+nC_array = [15000, 5000, 3000, 1000, 250]
 
 sqsums = np.array([])
 
-for site in site_array:
+C = []
+C_err = []
 
-    all, times = ImportData(f"ISO__Square_NN_PBC_N=20__site={site}__beta=1__rescale=-0.5", project_name="Pair_Correlations")
-    # all, times = ImportData(f"ISO__Random__N=9__site={site}__beta=1__numConfigs=8000", project_name="Pair_Correlations")
+for N, Nc in zip(N_array, nC_array):
+
+    all, times = ImportData(f"ISO__Random__N={N}__site=1__beta=1__numConfigs={Nc}", project_name="Pair_Correlations")
 
     G = np.array( [ gab for gab in all['results']['Re_correlation']][0] )
-    G_err = np.array( [ gab for gab in all['results']['Re_stds']][0] )
+    G_err = np.array( [ gab for gab in all['results']['Re_stddev']][0] )
     G_err = np.concatenate([G_err, np.flip(G_err)])
-    G_FM = np.concatenate([G, np.flip(G)])
-    plt.errorbar(times, G_FM, yerr=G_err, label = rf'FM Chebyshev, site={site}')
-    # plt.plot(times_ed, G_ed, '--', label = rf'ED, $\beta$={beta:.2g}')
-    # sqsums = np.append(sqsums, np.sum(np.abs(G_mirror-G_ed)**2)**0.5/len(G_mirror))
+    G = np.concatenate([G, np.flip(G)])
+    # plt.errorbar(times, G, yerr=G_err, label = rf'N={N}')
+    # plt.plot(times, G '--', label = rf'N={N}')
+    C.append(-G[0])
+    C_err.append(G_err[0])
 
-plt.xlabel(r'$\tau J_Q$')
-plt.ylabel(r'$g^{xx}$($\tau$)')
-# plt.ylim(0.24, 0.26)
-plt.legend()
+plt.ylabel(r'$g^{xx}_{12}$(0)')
+plt.xlabel(r'$N$')
+plt.errorbar(N_array, C, yerr=C_err)
+# plt.ylim(0.00001, 0.005)
+# plt.plot(N_array, 0.005/N_array)
+# plt.xlabel(r'$\tau /\beta$')
+# plt.ylabel(r'$g^{xx}$($\tau$)')
+# plt.ylim(-0.02, 0.26)
+# plt.xlim(0,1)
+# plt.legend()
 
-plt.savefig("Plots/Plot_site.pdf")
+plt.savefig("Plots/Plot_nlcorr.pdf")
 plt.clf()
 # plt.plot(beta_array, sqsums, 'o')
 # plt.yscale('log')

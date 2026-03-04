@@ -69,14 +69,12 @@ def ImportData_spinDMFT( spin_model, physical_data = "", project = "", selfcons 
     return all, disc 
 
 N=12
-beta_array = [0.2, 0.5, 1, 1.5, 2, 2.5]
+beta_array = [0.2, 0.5, 1, 1.5, 2., 2.5]
 h_z = 0.5
 foldername = f"Plots/Random_h_z={h_z:.1g}_N=12/"
 
 markers = ['v', '^', 's', 'x', 'D', 'p']
-fig_xx, ax_xx = plt.subplots()
-fig_xy, ax_xy = plt.subplots()
-fig_zz, ax_zz = plt.subplots()
+fig, (ax_xx, ax_xy, ax_zz) = plt.subplots(nrows=3, ncols=1, sharex=True, figsize=(8, 9), gridspec_kw={'hspace': 0})
 
 i=0
 for beta in beta_array:
@@ -117,18 +115,27 @@ for beta in beta_array:
 for ax in [ax_xx, ax_xy, ax_zz]:
     ax.set_xlabel(r'$\tau$/$\beta$')
     ax.set_xlim(0, 1)
-    ax.legend(fontsize=7)
-    ax.legend(marker_p, label_list, loc=4)
+ax_zz.legend(marker_p, label_list, loc=3)
 
 
 ax_xx.set_ylabel(r'$g_{xx}$($\tau$)')
 ax_xy.set_ylabel(r'Im $g_{xy}$($\tau$)')
 ax_zz.set_ylabel(r'$g_{zz}$($\tau$)')
-ax_xx.set_ylim(0.168, 0.252)
-ax_zz.set_ylim(0.168, 0.252)
+# AFM:
+# ax_xx.set_ylim(0.21, 0.252)
+# ax_zz.set_ylim(0.21, 0.252)
+
+# Random:
+ax_xx.set_ylim(0.165, 0.252)
+ax_zz.set_ylim(0.165, 0.252)
+ax_xx.text(0.95, 0.17, '(a)')
+ax_xy.text(0.95, -0.118, '(b)')
+ax_zz.text(0.95, 0.17, '(c)')
+
+# FM:
+# ax_xx.text(0.95, 0.085, '(a)')
+# ax_zz.text(0.95, 0.2318, '(c)')
+# ax_xy.text(0.95, -0.225, '(b)')
 
 
-
-fig_xx.savefig(foldername+"g_xx.pdf", dpi=1000)
-fig_xy.savefig(foldername+"g_xy.pdf", dpi=1000)
-fig_zz.savefig(foldername+"g_zz.pdf", dpi=1000)
+fig.savefig(foldername+"stack.pdf", dpi=1000)
