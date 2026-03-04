@@ -3,7 +3,7 @@ import h5py as h5
 import matplotlib.pyplot as plt
 
 J = 1
-N = 18
+N = 16
 
 couplings = np.ones((N, N))  # Random couplings
 couplings -= np.diag(np.diag(couplings))  # Set diagonal to zero
