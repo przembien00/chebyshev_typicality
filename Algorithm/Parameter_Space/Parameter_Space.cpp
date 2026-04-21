@@ -2,6 +2,8 @@
 
 #include<iostream>
 #include<string>
+#include<limits>
+#include<stdexcept>
 #include<hdf5.h>
 #include<blaze/Math.h>
 #include<boost/program_options.hpp>
@@ -148,7 +150,15 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     couplings_filename      = vm["srcfile"].as<std::string>();
     rescale = vm["rescale"].as<RealType>();
     read_SpinSystem(); // couplings and num_Spins are set
-    HilbertSpaceDimension = 1 << num_Spins; // 2^num_Spins
+    if( num_Spins == 0 )
+    {
+        throw std::runtime_error( "num_Spins must be positive" );
+    }
+    if( num_Spins >= std::numeric_limits<size_t>::digits )
+    {
+        throw std::runtime_error( "num_Spins is too large for HilbertSpaceDimension to fit in size_t" );
+    }
+    HilbertSpaceDimension = size_t{1} << num_Spins; // 2^num_Spins
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
     h_z = vm["h_z"].as<RealType>();
@@ -156,12 +166,28 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     symmetry_type = vm["symm_type"].as<char>();
     evol_type = vm["evol_type"].as<std::string>();
     spin_site = vm["spin_site"].as<uint>();
+    if( spin_model != "ISO" && spin_model != "XXZ" )
+    {
+        throw std::runtime_error( "spinmodel must be ISO or XXZ" );
+    }
+    if( symmetry_type != 'A' && symmetry_type != 'B' && symmetry_type != 'C' && symmetry_type != 'D' )
+    {
+        throw std::runtime_error( "symm_type must be A, B, C, or D" );
+    }
+    if( evol_type != "real" && evol_type != "imaginary" )
+    {
+        throw std::runtime_error( "evol_type must be real or imaginary" );
+    }
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
     CET_therm_error = vm["CET_therm_error"].as<RealType>();
     CET_evol_error = vm["CET_evol_error"].as<RealType>();
     num_TimePoints = vm["numTimePoints"].as<uint>();
+    if( num_TimePoints < 2 )
+    {
+        throw std::runtime_error( "numTimePoints must be at least 2" );
+    }
     if( evol_type == "real" )
     {
         Tmax = vm["Tmax"].as<RealType>();
@@ -179,8 +205,16 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
         full_diagonalization = true;
         num_Vectors_Per_Core = HilbertSpaceDimension / static_cast<uint>(world_size) + 1;
     }
+    if( spin_site >= num_Spins )
+    {
+        throw std::runtime_error( "spin_site must be smaller than num_Spins" );
+    }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();
+    if( !determine_bandwidth && !( E_max > E_min ) )
+    {
+        throw std::runtime_error( "E_max must be greater than E_min when determine_bandwidth is false" );
+    }
 
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
@@ -193,15 +227,44 @@ void ParameterSpace::read_SpinSystem()
     // 1) open file and group:
     std::string total_filename = "Couplings/" + couplings_filename + ".hdf5";
     hid_t file_id = H5Fopen( total_filename.c_str(), H5F_ACC_RDONLY, H5P_DEFAULT );
+    if( file_id < 0 )
+    {
+        throw std::runtime_error( "failed to open coupling file: " + total_filename );
+    }
     hid_t group_id = H5Gopen( file_id, "/all", H5P_DEFAULT );
+    if( group_id < 0 )
+    {
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to open group '/all' in coupling file: " + total_filename );
+    }
 
     // 2) read the number of spins:
     // a) open attribute and read type
     hid_t attr_id = H5Aopen( group_id, "num_Spins", H5P_DEFAULT );
+    if( attr_id < 0 )
+    {
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to open attribute 'num_Spins' in coupling file: " + total_filename );
+    }
     hid_t datatype_id = H5Aget_type( attr_id ); // datatype of the dataset -> uint
+    if( datatype_id < 0 )
+    {
+        H5Aclose( attr_id );
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to read attribute type 'num_Spins' in coupling file: " + total_filename );
+    }
 
     // b) read attribute data
-    H5Aread( attr_id, datatype_id, &num_Spins );
+    if( H5Aread( attr_id, datatype_id, &num_Spins ) < 0 )
+    {
+        H5Tclose( datatype_id );
+        H5Aclose( attr_id );
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to read attribute 'num_Spins' in coupling file: " + total_filename );
+    }
 
     // c) close attribute
     H5Tclose( datatype_id );
@@ -210,11 +273,31 @@ void ParameterSpace::read_SpinSystem()
     // 3) read the coupling data:
     // a) open dataset and read type
     hid_t dataset = H5Dopen2( group_id, "/all/J_ij", H5P_DEFAULT );
+    if( dataset < 0 )
+    {
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to open dataset '/all/J_ij' in coupling file: " + total_filename );
+    }
     hid_t datatype = H5Dget_type( dataset ); // datatype of the dataset -> double
+    if( datatype < 0 )
+    {
+        H5Dclose( dataset );
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to read dataset type '/all/J_ij' in coupling file: " + total_filename );
+    }
 
     // b) read linearized data from the dataset
     std::vector<double> linearized_data( num_Spins * num_Spins );
-    H5Dread( dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, linearized_data.data() );
+    if( H5Dread( dataset, datatype, H5S_ALL, H5S_ALL, H5P_DEFAULT, linearized_data.data() ) < 0 )
+    {
+        H5Tclose( datatype );
+        H5Dclose( dataset );
+        H5Gclose( group_id );
+        H5Fclose( file_id );
+        throw std::runtime_error( "failed to read dataset '/all/J_ij' in coupling file: " + total_filename );
+    }
 
     // c) close resources
     H5Tclose( datatype );

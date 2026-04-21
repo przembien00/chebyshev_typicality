@@ -19,7 +19,6 @@ class Hamiltonian
     public:
     long numSpins;
     long dim;
-    RealType CET_rescale;
     CouplingMatrix couplings;
     Parameters params;
     RealType E_max;

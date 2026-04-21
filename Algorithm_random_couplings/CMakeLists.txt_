@@ -61,7 +61,7 @@ set(SOURCES
 
 
 # Header files (for dependencies)
-set(GLOB_RECURSE HEADERS
+file(GLOB_RECURSE HEADERS
     "main_header.h"
     "Types/*.h"
     "Parameter_Space/*.h"

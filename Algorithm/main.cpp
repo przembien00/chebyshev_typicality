@@ -43,8 +43,8 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     CorrelationTensor new_correlations_R_sq(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     CorrelationTensor new_correlations_I_sq(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     // Initialize and thermalize
-    State psi_L = func::initialize_state( my_pspace, seed, k ); // |psi_0>
-    if( psi_L == State(my_pspace.HilbertSpaceDimension) ) 
+    State psi_L;
+    if( !func::initialize_state( my_pspace, seed, k, psi_L ) )
     {
         continue;
     }

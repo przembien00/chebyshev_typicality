@@ -455,7 +455,7 @@ Correlation& CorrelationTensor<Correlation>::operator()( const uint a, const uin
         else if( b == 1 ){  return get_zy(); }
         else{               return get_zz(); }
     }
-    //return Correlation(); // suppress compiler warnings
+    return get_xx(); // unreachable, keeps the compiler satisfied after the error checks above
 }
 
 template<typename Correlation>
@@ -487,7 +487,7 @@ Correlation CorrelationTensor<Correlation>::operator()( const uint a, const uint
         else if( b == 1 ){  return get_zy(); }
         else{               return get_zz(); }
     }
-    return Correlation(); // suppress compiler warnings
+    return get_xx(); // unreachable, keeps the compiler satisfied after the error checks above
 }
 
 // add two correlation tensors

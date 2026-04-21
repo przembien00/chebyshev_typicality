@@ -55,7 +55,6 @@ class ParameterSpace
     uint num_Vectors_Per_Core;
     RealType Gauss_covariance; // Covariance of the distribution used to draw states
     RealType dt;
-    RealType CET_rescale;
     uint num_PrintDigits;
     RealType Tmax;
     bool determine_bandwidth;

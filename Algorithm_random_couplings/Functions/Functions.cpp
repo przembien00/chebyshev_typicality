@@ -2,8 +2,11 @@
 #include"../Types/Tensors.h"
 #include"../Types/Correlations.h"
 #include"../Hamiltonians/Hamiltonians.h"
+#include"../cpp_libs/O_Error_Handling.h"
 #include<string>
 #include<cmath>
+#include<cstdint>
+#include<stdexcept>
 #include <boost/math/special_functions/bessel.hpp>
 #include <boost/math/special_functions/lambert_w.hpp>
 #include<blaze/Math.h>
@@ -14,6 +17,7 @@
 
 namespace ps = Parameter_Space;
 namespace ham = Hamiltonians;
+namespace error = Observables::Error_Handling;
 
 namespace Functions
 {
@@ -30,36 +34,46 @@ size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank )
 {
     if( pspace.seed.find("random") != std::string::npos ) // random seed
     {
-        size_t seed{};
+        std::uint64_t seed{};
         if( my_rank == 0 ) // draw seed on rank 0 
         {
             std::random_device my_seed{};
-            seed = my_seed();
+            seed = static_cast<std::uint64_t>( my_seed() );
         }
-        MPI_Bcast( &seed, 1, MPI_UNSIGNED, 0, MPI_COMM_WORLD ); // broadcast seed to all the other ranks
-        return seed;
+        MPI_Bcast( &seed, 1, MPI_UNSIGNED_LONG_LONG, 0, MPI_COMM_WORLD ); // broadcast seed to all the other ranks
+        return static_cast<size_t>( seed );
     }  
     else // preset seed
     {
-        return std::stoi( pspace.seed );
+        return static_cast<size_t>( std::stoull( pspace.seed ) );
     }    
 }
 
 size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample )
 {
-    return (size_t) std::abs( static_cast<int>(seed) - static_cast<int>((sample + pow(10,5)) * (my_rank+1)) );
+    std::uint64_t x = static_cast<std::uint64_t>( seed );
+    x ^= static_cast<std::uint64_t>( sample ) + 0x9e3779b97f4a7c15ULL + (x << 6) + (x >> 2);
+    x ^= static_cast<std::uint64_t>( my_rank + 1 ) + 0xbf58476d1ce4e5b9ULL + (x << 7) + (x >> 3);
+    x ^= x >> 30;
+    x *= 0xbf58476d1ce4e5b9ULL;
+    x ^= x >> 27;
+    x *= 0x94d049bb133111ebULL;
+    x ^= x >> 31;
+    return static_cast<size_t>( x );
 }
 
-State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample )
+bool initialize_state( const ps::ParameterSpace& pspace, size_t seed, size_t sample, State& state )
 {
-    State state(pspace.HilbertSpaceDimension);
+    state = State(pspace.HilbertSpaceDimension);
     if( pspace.full_diagonalization )
     {
         size_t index = sample + pspace.my_rank * pspace.num_Vectors_Per_Core;
         if( index < pspace.HilbertSpaceDimension )
         {
             state[index] = ComplexType{1.,0.};
+            return true;
         }
+        return false;
     }
     else
     {
@@ -72,8 +86,8 @@ State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample
 
             state[i] = ComplexType{a, b};
         }
+        return true;
     }
-    return state;
 }
 
 State S_alpha_i_act( const State& state, const long site, char alpha )
@@ -121,6 +135,10 @@ State S_alpha_i_act( const State& state, const long site, char alpha )
                 }
             }
             return new_state;
+        }
+        default:
+        {
+            throw std::runtime_error( std::string("invalid spin component '") + alpha + "' in " + __PRETTY_FUNCTION__ );
         }
     }
 }
@@ -194,6 +212,10 @@ void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace
             corrs_Im(2,2)[t] = std::imag(c);
             break;
         }
+        default:
+        {
+            error::SYMMETRY_TYPE( pspace.symmetry_type, __PRETTY_FUNCTION__ );
+        }
     }
 }
 
@@ -233,7 +255,13 @@ States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site 
             states.emplace_back(S_alpha_i_act(state,site,'z'));
             return states;
         }
+        default:
+        {
+            error::SYMMETRY_TYPE( pspace.symmetry_type, __PRETTY_FUNCTION__ );
+        }
     }
+
+    return states;
 }
 
 
