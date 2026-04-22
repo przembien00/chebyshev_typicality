@@ -1,5 +1,6 @@
 #include"Hamiltonians.h"
 #include<functional>
+#include<algorithm>
 #include<cmath>
 #include<string>
 #include<map>
@@ -98,6 +99,48 @@ State act_XXZ( const State& state, const Hamiltonian& H )
     return new_state;
 }
 
+State act_XXZ_h( const State& state, const Hamiltonian& H )
+// Apply the XXZ Heisenberg Hamiltonian with a z-field to the state vector.
+{
+    State new_state = - H.b_over_a * state; // shift to make the spectrum symmetrical
+    for( long ident = 0; ident < H.dim; ++ident )
+    {
+        for( long i = 0; i < H.numSpins; ++i )
+        {
+            for( long j = i; j < H.numSpins; ++j )
+            {
+                RealType J = H.couplings(i,j);
+                if( J == RealType{0.0} ) continue;
+
+                if( ( ( ident >> i ) & 1L) == ( (ident >> j)  & 1L ) )
+                {
+                    new_state[ident] += RealType{0.25} * J * H.params.lambda * state[ident];
+                }
+                else
+                {
+                    new_state[ident] += - RealType{0.25} * J * H.params.lambda * state[ident];
+                }
+
+                if( ( ( ident >> i ) & 1L) ^ ( (ident >> j)  & 1L ) )
+                {
+                    long new_ident = ( ident ^ ( 1L << j ) ) ^ ( 1L << i );
+                    new_state[new_ident] += RealType{0.5} * J * state[ident];
+                }
+            }
+            if( ident >> i & 1L )
+            {
+                new_state[ident] += RealType{0.5} * H.params.h_z * state[ident];
+            }
+            else
+            {
+                new_state[ident] += - RealType{0.5} * H.params.h_z * state[ident];
+            }
+        }
+    }
+
+    return new_state;
+}
+
 State act_ISO_h( const State& state, const Hamiltonian& H )
 // Apply the Isotropic Heisenberg Hamiltonian to the state vector.
 {   
@@ -168,7 +211,6 @@ void vector_initializer(std::vector<ComplexType>& v) {
 
 Hamiltonian::Hamiltonian( ps::ParameterSpace& pspace ):
 numSpins( pspace.num_Spins ),
-CET_rescale( pspace.CET_rescale ),
 dim( pspace.HilbertSpaceDimension ),
 couplings( pspace.couplings )
 {
@@ -178,16 +220,15 @@ couplings( pspace.couplings )
         spin_model += "_h";
         params.h_z = pspace.h_z;
     }
-    if(pspace.lambda != RealType{1.})
-    {
-        params.lambda = pspace.lambda;
-    }
+
+    params.lambda = pspace.lambda;
     
     // Define a mapping from models to actions of the Hamiltonian
     std::map< std::string, std::function< State( const State&, const Hamiltonian& ) > > model_map{
         {"ISO", act_ISO},
         {"XXZ", act_XXZ},
-        {"ISO_h", act_ISO_h}
+        {"ISO_h", act_ISO_h},
+        {"XXZ_h", act_XXZ_h}
     };
     // Define the action of the Hamiltonian based on the model.
     act = [model_map, model = spin_model, this](const State& state){
@@ -196,16 +237,10 @@ couplings( pspace.couplings )
     // Find the smallest and largest eigenvalue for the rescaling
     // Define matrix-vector multiplication in a suitable form
     auto mv_mul = [&](const std::vector<ComplexType>& in, std::vector<ComplexType>& out){
-        State psi(dim);
-        for( int i=0; i<in.size(); i++)
-        {
-            psi[i] = in[i];
-        }
+        State psi( dim );
+        std::copy( in.begin(), in.end(), psi.begin() );
         psi = act( psi );
-        for( int i=0; i<psi.size(); i++)
-        {
-            out[i] = psi[i];
-        }
+        out.assign( psi.begin(), psi.end() );
     };
     if( pspace.determine_bandwidth )
     {

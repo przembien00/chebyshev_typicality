@@ -2,6 +2,8 @@
 
 #include<iostream>
 #include<string>
+#include<limits>
+#include<stdexcept>
 #include<hdf5.h>
 #include<blaze/Math.h>
 #include<boost/program_options.hpp>
@@ -149,7 +151,15 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
 
     // ========== physical parameters ==========
     num_Spins = vm["numSpins"].as<uint>();
-    HilbertSpaceDimension = 1 << num_Spins; // 2^num_Spins
+    if( num_Spins == 0 )
+    {
+        throw std::runtime_error( "num_Spins must be positive" );
+    }
+    if( num_Spins >= std::numeric_limits<size_t>::digits )
+    {
+        throw std::runtime_error( "num_Spins is too large for HilbertSpaceDimension to fit in size_t" );
+    }
+    HilbertSpaceDimension = size_t{1} << num_Spins; // 2^num_Spins
     beta = vm["beta"].as<RealType>();
     spin_model = vm["spinmodel"].as<std::string>();
     h_z = vm["h_z"].as<RealType>();
@@ -157,13 +167,37 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     symmetry_type = vm["symm_type"].as<char>();
     evol_type = vm["evol_type"].as<std::string>();
     spin_site = vm["spin_site"].as<uint>();
+    if( spin_model != "ISO" && spin_model != "XXZ" )
+    {
+        throw std::runtime_error( "spinmodel must be ISO or XXZ" );
+    }
+    if( symmetry_type != 'A' && symmetry_type != 'B' && symmetry_type != 'C' && symmetry_type != 'D' )
+    {
+        throw std::runtime_error( "symm_type must be A, B, C, or D" );
+    }
+    if( evol_type != "real" && evol_type != "imaginary" )
+    {
+        throw std::runtime_error( "evol_type must be real or imaginary" );
+    }
+    if( spin_site >= num_Spins )
+    {
+        throw std::runtime_error( "spin_site must be smaller than num_Spins" );
+    }
 
     // ========== general numerical parameters ==========
     num_Coupling_Configs = vm["numCouplingConfigs"].as<uint>();
+    if( num_Coupling_Configs == 0 )
+    {
+        throw std::runtime_error( "numCouplingConfigs must be positive" );
+    }
     seed = vm["seed"].as<std::string>();
     CET_therm_error = vm["CET_therm_error"].as<RealType>();
     CET_evol_error = vm["CET_evol_error"].as<RealType>();
     num_TimePoints = vm["numTimePoints"].as<uint>();
+    if( num_TimePoints < 2 )
+    {
+        throw std::runtime_error( "numTimePoints must be at least 2" );
+    }
     if( evol_type == "real" )
     {
         Tmax = vm["Tmax"].as<RealType>();
@@ -174,6 +208,10 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     }
     dt = Tmax / static_cast<RealType>(num_TimePoints - 1);
     num_Vectors_Per_Core = vm["numVectorsPerCore"].as<uint>();
+    if( num_Vectors_Per_Core == 0 )
+    {
+        throw std::runtime_error( "numVectorsPerCore must be positive" );
+    }
     Gauss_covariance = vm["GaussCovariance"].as<RealType>();
     determine_bandwidth = vm["determine_bandwidth"].as<bool>();
     if( vm.count("fulldiag") )
@@ -183,6 +221,10 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();
+    if( !determine_bandwidth && !( E_max > E_min ) )
+    {
+        throw std::runtime_error( "E_max must be greater than E_min when determine_bandwidth is false" );
+    }
 
     // ========== saving and naming ==========
     project_name = vm["project"].as<std::string>();
@@ -198,11 +240,16 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
     couplings.resize( num_Spins );
     for( uint i = 0; i < num_Spins; ++i )
     {
+        couplings(i,i) = RealType{0.};
         for( uint j = i+1; j < num_Spins; ++j )
         {
             couplings(i,j) = d(gen);
+            JQ += std::pow( couplings(i,j), 2 );
         }
-        JQ += std::pow(couplings(0,i),2);
+    }
+    if( JQ == RealType{0.} )
+    {
+        throw std::runtime_error( "failed to generate nonzero random couplings" );
     }
     JQ = std::sqrt(JQ);
     couplings /= JQ; // Normalize couplings such that JQ=1

@@ -24,7 +24,7 @@ size_t generate_seed( const ps::ParameterSpace& pspace, const size_t my_rank );
 
 size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample );
 
-State initialize_state( const ps::ParameterSpace& pspace, uint seed, uint sample );
+bool initialize_state( const ps::ParameterSpace& pspace, size_t seed, size_t sample, State& state );
 
 void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im, CorrelationTensor& corrs_Re_sq, CorrelationTensor& corrs_Im_sq );
 
