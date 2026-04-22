@@ -1,6 +1,7 @@
 #pragma once
 
 #include<string>
+#include<vector>
 #include"../Types/Types.h"
 #include"../cpp_libs/Print_Routines.h"
 #include<hdf5.h>
@@ -45,7 +46,7 @@ class ParameterSpace
     RealType lambda;
     char symmetry_type;
     std::string evol_type;
-    uint spin_site;
+    std::vector<uint> spin_sites;
 
     // Numerical parameters
     RealType CET_therm_error; // Error threshold for thermalization

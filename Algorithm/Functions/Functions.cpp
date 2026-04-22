@@ -253,6 +253,18 @@ void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace
     }
 }
 
+void compute_correlations_at_sites( int t, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, const std::vector<uint>& spin_sites, std::vector<CorrelationTensor>& corrs_Re, std::vector<CorrelationTensor>& corrs_Im, std::vector<CorrelationTensor>& corrs_Re_sq, std::vector<CorrelationTensor>& corrs_Im_sq )
+{
+    if( spin_sites.size() != corrs_Re.size() || spin_sites.size() != corrs_Im.size() || spin_sites.size() != corrs_Re_sq.size() || spin_sites.size() != corrs_Im_sq.size() )
+    {
+        throw std::runtime_error( "spin_sites and correlation buffers must have the same length" );
+    }
+    for( size_t idx = 0; idx < spin_sites.size(); ++idx )
+    {
+        compute_correlations_at( t, static_cast<long>( spin_sites[idx] ), pspace, psi_L, v_psi_R, corrs_Re[idx], corrs_Im[idx], corrs_Re_sq[idx], corrs_Im_sq[idx] );
+    }
+}
+
 std::tuple<RealType, RealType> correlation( State& psi_L, State& psi_R, long site, char alpha )
 {
     ComplexType c = cdot( psi_L, S_alpha_i_act( psi_R, site, alpha ) );
@@ -419,6 +431,53 @@ void MPI_share_results( RealType& partition_function, RealType& partition_functi
     send_buf = { partition_function_sq };
     MPI_Allreduce( send_buf.data(), receive_buf.data(), 1, MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
     partition_function_sq = receive_buf.at(0);
+}
+
+void MPI_share_results( CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im,
+                        CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                        CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z )
+{
+    std::for_each( correlations_Re.begin(), correlations_Re.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Im.begin(), correlations_Im.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Re_sq.begin(), correlations_Re_sq.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( correlations_Im_sq.begin(), correlations_Im_sq.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( covariances_Re_Z.begin(), covariances_Re_Z.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
+
+    std::for_each( covariances_Im_Z.begin(), covariances_Im_Z.end(), []( CorrelationVector& spin_c )
+    {
+        std::vector<RealType> rcv_buf( spin_c.size() );
+        MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
+        spin_c = rcv_buf;
+    } );
 }
 
 void normalize( RealType& partition_function, CorrelationTensor& correlations )

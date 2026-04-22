@@ -2,6 +2,8 @@
 
 #include<fstream>
 #include<iostream>
+#include<sstream>
+#include<stdexcept>
 
 #include"../cpp_libs/File_Management.h"
 namespace fm = File_Management;
@@ -18,6 +20,30 @@ namespace Storage_Concept
 namespace ps = Parameter_Space;
 
 namespace hdf5r = HDF5_Routines;
+
+namespace
+{
+
+std::string spin_sites_to_filename_fragment( const std::vector<uint>& sites )
+{
+    std::stringstream ss;
+    for( size_t i = 0; i < sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            ss << "-";
+        }
+        ss << sites[i];
+    }
+    return ss.str();
+}
+
+std::string site_group_name( const uint site )
+{
+    return std::to_string( site ) + "-0";
+}
+
+}
 
 // ================= CLASS IMPLEMENTATIONS =================
 // HDF5 STORAGE CLASS
@@ -56,9 +82,9 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
     std::string filename = pspace.spin_model; // spin model info
     filename += "__" + pspace.couplings_filename;
     std::stringstream params_stream;
-    if( pspace.spin_site != 0 )
+    if( !( pspace.spin_sites.size() == 1 && pspace.spin_sites.front() == 0 ) )
     {
-        params_stream << "__site=" << pspace.spin_site;
+        params_stream << "__sites=" << spin_sites_to_filename_fragment( pspace.spin_sites );
     }
     params_stream << "__beta=" << pspace.beta;
     if (pspace.lambda != RealType{1.0})
@@ -110,9 +136,13 @@ void HDF5_Storage::create_file( const ps::ParameterSpace& pspace )
 }
 
 
-void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im, const CorrelationTensor& stds_Re, const CorrelationTensor& stds_Im )
+void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const std::vector<CorrelationTensor>& corr_Re, const std::vector<CorrelationTensor>& corr_Im, const std::vector<CorrelationTensor>& stds_Re, const std::vector<CorrelationTensor>& stds_Im )
 {
     if( !m_storing_permission ){ return; } // permission request
+    if( corr_Re.size() != pspace.spin_sites.size() || corr_Im.size() != pspace.spin_sites.size() || stds_Re.size() != pspace.spin_sites.size() || stds_Im.size() != pspace.spin_sites.size() )
+    {
+        throw std::runtime_error( "site result arrays do not match the configured spin_sites list" );
+    }
 
     // ===== store parameters =====
     auto ps_group_id = H5Gcreate( m_file_id, "parameters", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
@@ -124,7 +154,16 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
     hdf5r::store_string( ps_group_id, "src_file",                   tmp );
     hdf5r::store_string( ps_group_id, "spin_model",                 pspace.spin_model );
     hdf5r::store_scalar( ps_group_id, "rescale",                    pspace.rescale );
-    hdf5r::store_scalar( ps_group_id, "spin_site",                  pspace.spin_site );
+    std::stringstream spin_sites_stream;
+    for( size_t i = 0; i < pspace.spin_sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            spin_sites_stream << ",";
+        }
+        spin_sites_stream << pspace.spin_sites[i];
+    }
+    hdf5r::store_string( ps_group_id, "spin_sites",                 spin_sites_stream.str() );
     hdf5r::store_string( ps_group_id, "evol_type",                  pspace.evol_type );
     hdf5r::store_scalar( ps_group_id, "Tmax",                       pspace.Tmax );
 
@@ -143,11 +182,25 @@ void HDF5_Storage::store_main( const ps::ParameterSpace& pspace, const Correlati
 
     // ===== store results =====
     m_results_group_id = H5Gcreate( m_file_id, "results", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
-    
-    store_correlation_tensor( corr_Re, m_results_group_id, "Re_correlation", "Real part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
-    store_correlation_tensor( corr_Im, m_results_group_id, "Im_correlation", "Imaginary part of correlations <S^alpha(t)S^beta(0)>, stored according to the hierarchy alpha-beta, t" );
-    store_correlation_tensor( stds_Re, m_results_group_id, "Re_stds", "Standard deviations of the real part of correlations, stored according to the hierarchy alpha-beta, t" );
-    store_correlation_tensor( stds_Im, m_results_group_id, "Im_stds", "Standard deviations of the imaginary part of correlations, stored according to the hierarchy alpha-beta, t" );
+
+    hid_t re_group = H5Gcreate( m_results_group_id, "Re_correlation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    hid_t im_group = H5Gcreate( m_results_group_id, "Im_correlation", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    hid_t re_stds_group = H5Gcreate( m_results_group_id, "Re_stds", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    hid_t im_stds_group = H5Gcreate( m_results_group_id, "Im_stds", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+
+    for( size_t site_idx = 0; site_idx < pspace.spin_sites.size(); ++site_idx )
+    {
+        const std::string group_name = site_group_name( pspace.spin_sites[site_idx] );
+        store_correlation_tensor( corr_Re[site_idx], re_group, group_name, "Real part of correlations <S^a_i(t)S^b_0(0)> for a given site" );
+        store_correlation_tensor( corr_Im[site_idx], im_group, group_name, "Imaginary part of correlations <S^a_i(t)S^b_0(0)> for a given site" );
+        store_correlation_tensor( stds_Re[site_idx], re_stds_group, group_name, "Standard deviations of the real part of correlations for a given site" );
+        store_correlation_tensor( stds_Im[site_idx], im_stds_group, group_name, "Standard deviations of the imaginary part of correlations for a given site" );
+    }
+
+    H5Gclose( re_group );
+    H5Gclose( im_group );
+    H5Gclose( re_stds_group );
+    H5Gclose( im_stds_group );
 
     H5Gclose( m_results_group_id );
 }

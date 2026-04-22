@@ -27,6 +27,7 @@ size_t throw_seed( const size_t seed, const size_t my_rank, const size_t sample 
 bool initialize_state( const ps::ParameterSpace& pspace, size_t seed, size_t sample, State& state );
 
 void compute_correlations_at( int t, long site, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, CorrelationTensor& corrs_Re, CorrelationTensor& corrs_Im, CorrelationTensor& corrs_Re_sq, CorrelationTensor& corrs_Im_sq );
+void compute_correlations_at_sites( int t, const ps::ParameterSpace& pspace, State& psi_L, States& v_psi_R, const std::vector<uint>& spin_sites, std::vector<CorrelationTensor>& corrs_Re, std::vector<CorrelationTensor>& corrs_Im, std::vector<CorrelationTensor>& corrs_Re_sq, std::vector<CorrelationTensor>& corrs_Im_sq );
 
 State S_alpha_i_act( const State& state, const long site, char alpha );
 
@@ -36,6 +37,9 @@ void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::
 
 void MPI_share_results( RealType& partition_function, RealType& partition_function_sq,
                         CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, 
+                        CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
+                        CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z );
+void MPI_share_results( CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im,
                         CorrelationTensor& correlations_Re_sq, CorrelationTensor& correlations_Im_sq,
                         CorrelationTensor& covariances_Re_Z, CorrelationTensor& covariances_Im_Z );
 

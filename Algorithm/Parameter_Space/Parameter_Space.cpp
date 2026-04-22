@@ -2,8 +2,10 @@
 
 #include<iostream>
 #include<string>
+#include<algorithm>
 #include<limits>
 #include<stdexcept>
+#include<sstream>
 #include<hdf5.h>
 #include<blaze/Math.h>
 #include<boost/program_options.hpp>
@@ -14,6 +16,80 @@ namespace Parameter_Space
 {
 
 namespace bpo = boost::program_options;
+
+namespace
+{
+
+std::vector<uint> parse_spin_sites( const std::string& raw_sites )
+{
+    std::vector<uint> spin_sites{};
+    for( const auto& token : print::split_string_at_delimiter( raw_sites, ',' ) )
+    {
+        auto first = token.find_first_not_of( " \t\n\r" );
+        if( first == std::string::npos )
+        {
+            continue;
+        }
+        auto last = token.find_last_not_of( " \t\n\r" );
+        std::string trimmed = token.substr( first, last - first + 1 );
+        if( trimmed.empty() || std::any_of( trimmed.begin(), trimmed.end(), []( unsigned char c )
+        {
+            return c < '0' || c > '9';
+        } ) )
+        {
+            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
+        }
+        try
+        {
+            spin_sites.push_back( static_cast<uint>( std::stoul( trimmed ) ) );
+        }
+        catch( const std::exception& )
+        {
+            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
+        }
+    }
+    if( spin_sites.empty() )
+    {
+        throw std::runtime_error( "spin_sites must contain at least one site" );
+    }
+    auto sorted_sites = spin_sites;
+    std::sort( sorted_sites.begin(), sorted_sites.end() );
+    if( std::adjacent_find( sorted_sites.begin(), sorted_sites.end() ) != sorted_sites.end() )
+    {
+        throw std::runtime_error( "spin_sites must not contain duplicates" );
+    }
+    return spin_sites;
+}
+
+std::string spin_sites_to_string( const std::vector<uint>& sites, const char delimiter = ',' )
+{
+    std::stringstream ss;
+    for( size_t i = 0; i < sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            ss << delimiter;
+        }
+        ss << sites[i];
+    }
+    return ss.str();
+}
+
+std::string spin_sites_to_filename_fragment( const std::vector<uint>& sites )
+{
+    std::stringstream ss;
+    for( size_t i = 0; i < sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            ss << "-";
+        }
+        ss << sites[i];
+    }
+    return ss.str();
+}
+
+}
 
 // ===============================================================
 // ==================== PARAMETER SPACE CLASS ====================
@@ -72,9 +148,9 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     imaginary = imaginary time evolution, \
     real = real time evolution"
     )(
-    "spin_site", bpo::value<uint>()->default_value(uint{0}),
-    "set the spin with which the correlations are computed \
-    (they look like < S_0^a(t) S_i^b(0) >, where i is spin_site and 0 the first spin in the coupling file)"
+    "spin_sites", bpo::value<std::string>()->default_value("0"),
+    "set the spins with which the correlations are computed \
+    (they look like < S_0^a(t) S_i^b(0) >, where i is listed in spin_sites and 0 the first spin in the coupling file)"
     )(
     "Tmax", bpo::value<RealType>()->default_value(RealType{5.0}),
     "set the maximum time for real time evolution"
@@ -165,7 +241,6 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     lambda = vm["lambda"].as<RealType>();
     symmetry_type = vm["symm_type"].as<char>();
     evol_type = vm["evol_type"].as<std::string>();
-    spin_site = vm["spin_site"].as<uint>();
     if( spin_model != "ISO" && spin_model != "XXZ" )
     {
         throw std::runtime_error( "spinmodel must be ISO or XXZ" );
@@ -178,6 +253,7 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     {
         throw std::runtime_error( "evol_type must be real or imaginary" );
     }
+    spin_sites = parse_spin_sites( vm["spin_sites"].as<std::string>() );
 
     // ========== general numerical parameters ==========
     seed = vm["seed"].as<std::string>();
@@ -205,9 +281,12 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
         full_diagonalization = true;
         num_Vectors_Per_Core = HilbertSpaceDimension / static_cast<uint>(world_size) + 1;
     }
-    if( spin_site >= num_Spins )
+    for( const auto site : spin_sites )
     {
-        throw std::runtime_error( "spin_site must be smaller than num_Spins" );
+        if( site >= num_Spins )
+        {
+            throw std::runtime_error( "all spin_sites must be smaller than num_Spins" );
+        }
     }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();
@@ -330,6 +409,7 @@ std::string ParameterSpace::create_essentials_string() const
     << print::quantity_to_output_line( pre_colon_space, "beta"          , print::remove_zeros(print::round_value_to_string(beta,num_PrintDigits)) )
     << print::quantity_to_output_line( pre_colon_space, "h_z"          , print::remove_zeros(print::round_value_to_string(h_z,num_PrintDigits)) )
     << print::quantity_to_output_line( pre_colon_space, "rescale"            , print::remove_zeros(print::round_value_to_string(rescale,num_PrintDigits)) )
+    << print::quantity_to_output_line( pre_colon_space, "spin_sites"  , spin_sites_to_string( spin_sites ) )
     << print::quantity_to_output_line( pre_colon_space, "num_TimePoints" , std::to_string(num_TimePoints) ) 
     << print::quantity_to_output_line( pre_colon_space, "dt"       , print::remove_zeros(print::round_value_to_string(dt,num_PrintDigits)) ) 
     << print::quantity_to_output_line( pre_colon_space, "num_Vectors"   , std::to_string(num_Vectors_Per_Core*world_size) );

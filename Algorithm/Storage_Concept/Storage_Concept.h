@@ -4,9 +4,10 @@
 #include"../Types/Tensors.h"
 #include"../Types/Correlations.h"
 #include"../cpp_libs/HDF5_Routines.h"
+#include<vector>
 #ifdef USE_DOUBLE
 static hid_t H5_REAL_TYPE = H5T_IEEE_F64LE;
-#endif 
+#endif
 #ifdef USE_FLOAT 
 static hid_t H5_REAL_TYPE = H5T_IEEE_F32LE;
 #endif
@@ -28,7 +29,7 @@ class HDF5_Storage
  public:
     HDF5_Storage( const int my_rank, const ps::ParameterSpace& pspace );
 
-    void store_main( const ps::ParameterSpace& pspace, const CorrelationTensor& corr_Re, const CorrelationTensor& corr_Im, const CorrelationTensor& stds_Re, const CorrelationTensor& stds_Im );
+    void store_main( const ps::ParameterSpace& pspace, const std::vector<CorrelationTensor>& corr_Re, const std::vector<CorrelationTensor>& corr_Im, const std::vector<CorrelationTensor>& stds_Re, const std::vector<CorrelationTensor>& stds_Im );
 
     void finalize();
 
