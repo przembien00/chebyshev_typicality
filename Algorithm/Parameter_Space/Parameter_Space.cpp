@@ -17,6 +17,10 @@ namespace Parameter_Space
 
 namespace bpo = boost::program_options;
 
+// forward declarations of file-local helpers defined later in this file
+static std::vector<uint> parse_spin_sites( const std::string& raw_sites );
+static std::string spin_sites_to_string( const std::vector<uint>& sites, char delimiter = ',' );
+
 
 // ===============================================================
 // ==================== PARAMETER SPACE CLASS ====================
@@ -389,7 +393,7 @@ std::vector<uint> parse_spin_sites( const std::string& raw_sites )
     return spin_sites;
 }
 
-std::string spin_sites_to_string( const std::vector<uint>& sites, const char delimiter = ',' )
+std::string spin_sites_to_string( const std::vector<uint>& sites, const char delimiter )
 {
     std::stringstream ss;
     for( size_t i = 0; i < sites.size(); ++i )

@@ -1,6 +1,8 @@
 #pragma once
 #include<chrono>
 #include<string>
+#include<vector>
+#include<utility>
 #include"../Types/Types.h"
 #include"../Parameter_Space/Parameter_Space.h"
 
@@ -15,6 +17,8 @@ class Clock
     int my_rank;
     std::chrono::steady_clock::time_point program_start;
     std::chrono::steady_clock::time_point last_measurement;
+    std::vector<std::pair<std::string, double>> m_measurements; // (task_name, duration_s)
+    double m_total_s{0.};
 
     public:
     Clock() = default;
@@ -22,6 +26,9 @@ class Clock
 
     void measure( const std::string& task );
     void finalize();
+
+    const std::vector<std::pair<std::string, double>>& get_measurements() const { return m_measurements; }
+    double get_total_s() const { return m_total_s; }
 };
 
 class Simple_Estimator

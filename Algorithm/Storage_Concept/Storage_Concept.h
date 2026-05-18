@@ -8,10 +8,11 @@
 #ifdef USE_DOUBLE
 static hid_t H5_REAL_TYPE = H5T_IEEE_F64LE;
 #endif
-#ifdef USE_FLOAT 
+#ifdef USE_FLOAT
 static hid_t H5_REAL_TYPE = H5T_IEEE_F32LE;
 #endif
 #include"../Parameter_Space/Parameter_Space.h"
+#include"../Time_Measurement/Time_Measurement.h"
 
 
 namespace Storage_Concept
@@ -30,6 +31,8 @@ class HDF5_Storage
     HDF5_Storage( const int my_rank, const ps::ParameterSpace& pspace );
 
     void store_main( const ps::ParameterSpace& pspace, const std::vector<CorrelationTensor>& corr_Re, const std::vector<CorrelationTensor>& corr_Im, const std::vector<CorrelationTensor>& stds_Re, const std::vector<CorrelationTensor>& stds_Im );
+
+    void store_runtime( const Time_Measurement::Clock& clock );
 
     void finalize();
 

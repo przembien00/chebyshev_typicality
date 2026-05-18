@@ -105,9 +105,10 @@ my_clock.measure("Correlations");
 // Store correlations
 stor::HDF5_Storage my_data_storage( my_rank, my_pspace );
 my_data_storage.store_main( my_pspace, correlations_R, correlations_I, stds_R, stds_I );
-my_data_storage.finalize();
 my_clock.measure("Saving");
 my_clock.finalize();
+my_data_storage.store_runtime( my_clock );
+my_data_storage.finalize();
 MPI_Finalize();
 print::print_R0( my_rank, "+++++++++++++++++++++++++++++++++++++++++++++++++++++\n" );
 

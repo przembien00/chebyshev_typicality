@@ -1,0 +1,62 @@
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/main_header.h:10,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Types/Types.h:12:1: warning: inline variables are only available with '-std=c++17' or '-std=gnu++17'
+   12 | inline MPI_Datatype MPI_REALTYPE = MPI_DOUBLE;
+      | ^~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/main_header.h:12,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Types/Tensors.h: In member function 'Correlation Tensors::CorrelationTensor<Correlation>::zero_correlation(std::string) const':
+/work/mprzbien/chebyshev_typicality/Algorithm/Types/Tensors.h:896:8: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+  896 |     if constexpr ( HasZeroAccordingTo<Correlation>::value )
+      |        ^~~~~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Hamiltonians/Hamiltonians.h:2,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/Hamiltonians/Hamiltonians.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Hamiltonians/../Types/Types.h:12:1: warning: inline variables are only available with '-std=c++17' or '-std=gnu++17'
+   12 | inline MPI_Datatype MPI_REALTYPE = MPI_DOUBLE;
+      | ^~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/Storage_Concept.h:6,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main_header.h:27,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/../cpp_libs/HDF5_Routines.h: In function 'hid_t HDF5_Routines::get_H5_Type(const T&)':
+/work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/../cpp_libs/HDF5_Routines.h:21:8: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+   21 |     if constexpr ( std::is_same<T,char>::value )
+      |        ^~~~~~~~~
+/work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/../cpp_libs/HDF5_Routines.h:25:13: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+   25 |     else if constexpr ( std::is_same<T,unsigned int>::value ||  std::is_same<T,long unsigned int>::value || std::is_same<T,int>::value || std::is_same<T,long int>::value || std::is_same<T,size_t>::value )
+      |             ^~~~~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/Storage_Concept.h:6,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main_header.h:27,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/main.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/../cpp_libs/HDF5_Routines.h:29:13: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+   29 |     else if constexpr ( std::is_same<T,double>::value )
+      |             ^~~~~~~~~
+/work/mprzbien/chebyshev_typicality/Algorithm/Storage_Concept/../cpp_libs/HDF5_Routines.h:33:13: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+   33 |     else if constexpr ( std::is_same<T,float>::value )
+      |             ^~~~~~~~~
+/work/mprzbien/chebyshev_typicality/Algorithm/main.cpp: In function 'int main(int, char* const*)':
+/work/mprzbien/chebyshev_typicality/Algorithm/main.cpp:33:6: warning: structured bindings only available with '-std=c++17' or '-std=gnu++17'
+   33 | auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
+      |      ^
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.h:5,
+                 from /work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/../Types/Types.h:12:1: warning: inline variables are only available with '-std=c++17' or '-std=gnu++17'
+   12 | inline MPI_Datatype MPI_REALTYPE = MPI_DOUBLE;
+      | ^~~~~~
+/work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp: In constructor 'Parameter_Space::ParameterSpace::ParameterSpace(int, char* const*, int, int)':
+/work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp:183:18: error: 'parse_spin_sites' was not declared in this scope; did you mean 'spin_sites'?
+  183 |     spin_sites = parse_spin_sites( vm["spin_sites"].as<std::string>() );
+      |                  ^~~~~~~~~~~~~~~~
+      |                  spin_sites
+/work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp: In member function 'std::string Parameter_Space::ParameterSpace::create_essentials_string() const':
+/work/mprzbien/chebyshev_typicality/Algorithm/Parameter_Space/Parameter_Space.cpp:339:73: error: 'spin_sites_to_string' was not declared in this scope
+  339 |     << print::quantity_to_output_line( pre_colon_space, "spin_sites"  ,spin_sites_to_string( spin_sites ) )
+      |                                                                        ^~~~~~~~~~~~~~~~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Functions/Functions.cpp:1:
+/work/mprzbien/chebyshev_typicality/Algorithm/Functions/../Types/Types.h:12:1: warning: inline variables are only available with '-std=c++17' or '-std=gnu++17'
+   12 | inline MPI_Datatype MPI_REALTYPE = MPI_DOUBLE;
+      | ^~~~~~
+In file included from /work/mprzbien/chebyshev_typicality/Algorithm/Functions/Functions.cpp:2:
+/work/mprzbien/chebyshev_typicality/Algorithm/Functions/../Types/Tensors.h: In member function 'Correlation Tensors::CorrelationTensor<Correlation>::zero_correlation(std::string) const':
+/work/mprzbien/chebyshev_typicality/Algorithm/Functions/../Types/Tensors.h:896:8: warning: 'if constexpr' only available with '-std=c++17' or '-std=gnu++17'
+  896 |     if constexpr ( HasZeroAccordingTo<Correlation>::value )
+      |  

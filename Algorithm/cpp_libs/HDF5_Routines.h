@@ -72,8 +72,9 @@ inline bool store_string( const hid_t ID, const std::string& name, const std::st
     auto datatype_id = H5Tcopy( H5T_C_S1 );
     H5Tset_size( datatype_id, value.size() + 1 );
     auto attr_id = H5Acreate( ID, name.c_str(), datatype_id, space_id, H5P_DEFAULT, H5P_DEFAULT );
-    auto status = H5Awrite( attr_id, datatype_id, &value );
+    auto status = H5Awrite( attr_id, datatype_id, value.c_str() );
     H5Aclose( attr_id );
+    H5Tclose( datatype_id );
     H5Sclose( space_id );
     return (status < 0) ? false : true;
 }
@@ -220,13 +221,11 @@ bool import_scalar( const hid_t ID, const std::string& name, T& value )
 inline bool import_string( const hid_t ID, const std::string& name, std::string& str )
 {
     hid_t attr = H5Aopen( ID, name.c_str(), H5P_DEFAULT );
-    hid_t type = H5Aget_type( attr ); // datatype of the data
-    hid_t type_mem = H5Tget_native_type(type, H5T_DIR_ASCEND);
-    char* buffer;
-    auto status = H5Aread(attr, type_mem, &buffer);
-    str = std::string(buffer);
-    H5free_memory(buffer);
-    H5Tclose(type_mem);
+    hid_t type = H5Aget_type( attr );
+    size_t size = H5Tget_size( type );
+    std::vector<char> buffer( size + 1, '\0' );
+    auto status = H5Aread( attr, type, buffer.data() );
+    str = std::string( buffer.data() );
     H5Tclose( type );
     H5Aclose( attr );
     return (status < 0) ? false : true;

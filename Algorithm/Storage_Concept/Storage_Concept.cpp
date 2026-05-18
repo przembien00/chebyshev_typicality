@@ -212,6 +212,19 @@ void HDF5_Storage::store_correlation_tensor( const CorrelationTensor& CT, const 
     hdf5r::store_2D_tensor<RealType>(group_id, dataset_name, H5_REAL_TYPE, CT, dataset_info);
 }
 
+void HDF5_Storage::store_runtime( const Time_Measurement::Clock& clock )
+{
+    if( !m_storing_permission ){ return; }
+
+    auto group_id = H5Gcreate( m_file_id, "runtime_data", H5P_DEFAULT, H5P_DEFAULT, H5P_DEFAULT );
+    for( const auto& [name, secs] : clock.get_measurements() )
+    {
+        hdf5r::store_scalar( group_id, name + "_s", secs );
+    }
+    hdf5r::store_scalar( group_id, "total_s", clock.get_total_s() );
+    H5Gclose( group_id );
+}
+
 void HDF5_Storage::finalize()
 {
     if( !m_storing_permission ){ return; } // permission request

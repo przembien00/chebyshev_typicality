@@ -19,42 +19,48 @@ my_rank(rank)
 void Clock::measure( const std::string& task )
 {
     auto now = std::chrono::steady_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - last_measurement).count();
-    if( duration < 1 )
-    {
-        duration = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_measurement).count();
-        print::print_R0(my_rank,"\033[1;36m" + task + " done, took " + std::to_string(duration) + " ms\033[0m\n");
-        last_measurement = now;
-        return;
-    }
-    else if( duration > 600 )
-    {
-        duration = std::chrono::duration_cast<std::chrono::minutes>(now - last_measurement).count();
-        print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(duration) + " min\033[0m\n");
-        last_measurement = now;
-        return;
-    }
+    double duration_s = std::chrono::duration<double>(now - last_measurement).count();
+    m_measurements.emplace_back(task, duration_s);
     last_measurement = now;
-    print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(duration) + " s\033[0m\n");
+
+    auto duration = std::chrono::duration_cast<std::chrono::seconds>(now - last_measurement).count();
+    if( duration_s < 1.0 )
+    {
+        auto ms = static_cast<long>(duration_s * 1000.0);
+        print::print_R0(my_rank,"\033[1;36m" + task + " done, took " + std::to_string(ms) + " ms\033[0m\n");
+    }
+    else if( duration_s > 600.0 )
+    {
+        auto min = static_cast<long>(duration_s / 60.0);
+        print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(min) + " min\033[0m\n");
+    }
+    else
+    {
+        auto s = static_cast<long>(duration_s);
+        print::print_R0(my_rank, "\033[1;36m" + task + " done, took " + std::to_string(s) + " s\033[0m\n");
+    }
 }
 
 void Clock::finalize()
 {
     auto end = std::chrono::steady_clock::now();
-    auto total_duration = std::chrono::duration_cast<std::chrono::seconds>(end - program_start).count();
-    if( total_duration < 1 )
+    m_total_s = std::chrono::duration<double>(end - program_start).count();
+
+    if( m_total_s < 1.0 )
     {
-        total_duration = std::chrono::duration_cast<std::chrono::milliseconds>(end - program_start).count();
-        print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " ms\n");
-        return;
+        auto ms = static_cast<long>(m_total_s * 1000.0);
+        print::print_R0(my_rank, "Total program duration: " + std::to_string(ms) + " ms\n");
     }
-    if( total_duration > 600 )
+    else if( m_total_s > 600.0 )
     {
-        total_duration = std::chrono::duration_cast<std::chrono::minutes>(end - program_start).count();
-        print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " min\n");
-        return;
+        auto min = static_cast<long>(m_total_s / 60.0);
+        print::print_R0(my_rank, "Total program duration: " + std::to_string(min) + " min\n");
     }
-    print::print_R0(my_rank, "Total program duration: " + std::to_string(total_duration) + " s\n");
+    else
+    {
+        auto s = static_cast<long>(m_total_s);
+        print::print_R0(my_rank, "Total program duration: " + std::to_string(s) + " s\n");
+    }
 }
 
 Simple_Estimator::Simple_Estimator( const int rank, const size_t num_iterations, std::string task_name ):
