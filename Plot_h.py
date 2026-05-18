@@ -1,69 +1,120 @@
-import numpy as np
-import matplotlib.pyplot as plt
+from __future__ import annotations
+
+"""Compare Chebyshev data for `N=20` and `N=24` at zero field."""
+
+import os
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+MPL_CONFIG_DIR = ROOT / ".mplconfig"
+XDG_CACHE_DIR = ROOT / ".cache"
+MPL_CONFIG_DIR.mkdir(exist_ok=True)
+XDG_CACHE_DIR.mkdir(exist_ok=True)
+
+os.environ.setdefault("HDF5_USE_FILE_LOCKING", "FALSE")
+os.environ.setdefault("MPLBACKEND", "Agg")
+os.environ.setdefault("MPLCONFIGDIR", str(MPL_CONFIG_DIR))
+os.environ.setdefault("XDG_CACHE_HOME", str(XDG_CACHE_DIR))
+
+import matplotlib as mpl
+
+mpl.rc_file(str(ROOT / "matplotlibrc"))
+
 import h5py as h5
+import matplotlib.pyplot as plt
+from matplotlib.lines import Line2D
+import numpy as np
 
 
-def ImportData(physical_data, project_name = ""):
-    # process the inserted data:
-    root_folder = "Data"
+DATA_DIR = ROOT / "Data"
+PLOTS_DIR = ROOT / "Plots"
 
-    # determine the folder:
-    foldername = root_folder + "/"
-    if project_name != "":
-        foldername += project_name + "/"
+BETAS = [0.2, 0.5, 1.0, 1.5, 2.0, 2.5]
+SIZES = {
+    20: "tab:blue",
+    24: "tab:orange",
+}
+MARKERS = ["v", "^", "s", "x", "D", "+"]
+RESCALES = [0.5, -0.5]
 
-    # determine file and return data:
-    filename = foldername + physical_data + ".hdf5"
-    all = h5.File( filename, 'r' )
 
-    # discretization
-    params =  all['parameters']
-    disc = np.linspace(0., 1, 2*params.attrs['num_TimePoints'])
+def import_data(physical_data: str, project_name: str = "") -> tuple[h5.File, np.ndarray]:
+    """Open one HDF5 file and return the handle together with the tau grid."""
 
-    return all, disc
+    folder = DATA_DIR / project_name if project_name else DATA_DIR
+    path = folder / f"{physical_data}.hdf5"
+    if not path.exists():
+        raise FileNotFoundError(path)
 
-def ImportData_ED(physical_data, project_name = ""):
-    # process the inserted data:
-    root_folder = "Data/ED_new"
+    handle = h5.File(path, "r")
+    num_time_points = int(handle["parameters"].attrs["num_TimePoints"])
+    tau = np.linspace(0.0, 1.0, 2 * num_time_points)
+    return handle, tau
 
-    # determine the folder:
-    foldername = root_folder + "/"
-    if project_name != "":
-        foldername += project_name + "/"
 
-    # determine file and return data:
-    filename = foldername + physical_data + ".hdf5"
-    all = h5.File( filename, 'r' )
+def load_curve(size: int, beta: float, rescale: float) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """Load the xx Chebyshev correlation and its standard deviation."""
 
-    # discretization
-    params =  all['parameters']
-    disc = np.linspace(0., 1, params.attrs['num_TimePoints'])
+    rescale_tag = f"{rescale:.1g}"
+    physical_data = f"ISO__Square_NN_PBC_N={size}__beta={beta:.2g}__rescale={rescale_tag}"
+    all_data, tau = import_data(physical_data)
+    try:
+        g_half = np.asarray(all_data["results"]["Re_correlation"][0], dtype=float)
+        g_err_half = np.asarray(all_data["results"]["Re_stds"][0], dtype=float)
+    finally:
+        all_data.close()
 
-    return all, disc
+    g = np.concatenate((g_half, np.flip(g_half)))
+    g_err = np.concatenate((g_err_half, np.flip(g_err_half)))
+    return tau, g, g_err
 
-beta_array = [0.2, 0.5, 1, 1.5, 2, 2.5]
 
-for beta in beta_array:
+def plot_rescale(rescale: float) -> None:
+    fig, ax = plt.subplots(figsize=(7.4, 4.3))
 
-    all_20, times = ImportData(f"ISO__Square_NN_PBC_N=20__beta={beta:.2g}__rescale=0.5")
-    all_24, times = ImportData(f"ISO__Square_NN_PBC_N=24__beta={beta:.2g}__rescale=0.5")
+    for beta_index, beta in enumerate(BETAS):
+        marker = MARKERS[beta_index % len(MARKERS)]
+        for size, color in SIZES.items():
+            tau, g, g_err = load_curve(size, beta, rescale)
+            ax.errorbar(
+                tau,
+                g,
+                yerr=g_err,
+                color=color,
+                linestyle="-",
+                marker=marker,
+                markevery=20,
+                errorevery=5,
+            )
 
-    G_20 = np.array( [ gab for gab in all_20['results']['Re_correlation']][0] )
-    G_24 = np.array( [ gab for gab in all_24['results']['Re_correlation']][0] )
-    G_err_20 = np.array( [ gab for gab in all_20['results']['Re_stds']][0] )
-    G_err_24 = np.array( [ gab for gab in all_24['results']['Re_stds']][0] )
+    size_handles = [
+        Line2D([0], [0], color=color, lw=2, label=rf"$N={size}$")
+        for size, color in SIZES.items()
+    ]
+    beta_handles = [
+        Line2D([0], [0], color="black", marker=MARKERS[i], linestyle="None", label=rf"$\beta J_Q = {beta:.2g}$")
+        for i, beta in enumerate(BETAS)
+    ]
 
-    G_20 = np.concatenate((G_20,np.flip(G_20)))
-    G_err_20 = np.concatenate((G_err_20,np.flip(G_err_20)))
-    plt.errorbar(times, G_20, yerr=G_err_20, label=rf'CET N=20, $\beta={beta:.2g}$')
+    legend_sizes = ax.legend(handles=size_handles, loc="upper right", title="System size")
+    ax.add_artist(legend_sizes)
+    ax.legend(handles=beta_handles, loc="lower left", title="Temperature")
 
-    G_24 = np.concatenate((G_24,np.flip(G_24)))
-    G_err_24 = np.concatenate((G_err_24,np.flip(G_err_24)))
-    plt.errorbar(times, G_24, yerr=G_err_24, linestyle=':', label=rf'CET N=24, $\beta={beta:.2g}$')
+    ax.set_xlabel(r"$\tau/\beta$")
+    ax.set_ylabel(r"$g_{xx}(\tau)$")
+    ax.set_xlim(tau[0], tau[-1])
+    ax.margins(x=0)
 
-plt.xlabel(r'$\tau$/$\beta$')
-plt.ylabel(r'$g_{xx}$($\tau$)')
-# plt.ylim(0.24, 0.26)
-plt.legend(fontsize=8)
+    PLOTS_DIR.mkdir(exist_ok=True)
+    rescale_tag = "0p5" if rescale > 0 else "m0p5"
+    output = PLOTS_DIR / f"Plot_20v24_rescale_{rescale_tag}.pdf"
+    fig.savefig(output, dpi=1000, bbox_inches="tight")
 
-plt.savefig("Plots/Plot_20v24.pdf")
+
+def main() -> None:
+    for rescale in RESCALES:
+        plot_rescale(rescale)
+
+
+if __name__ == "__main__":
+    main()

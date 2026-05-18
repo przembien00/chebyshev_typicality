@@ -17,79 +17,6 @@ namespace Parameter_Space
 
 namespace bpo = boost::program_options;
 
-namespace
-{
-
-std::vector<uint> parse_spin_sites( const std::string& raw_sites )
-{
-    std::vector<uint> spin_sites{};
-    for( const auto& token : print::split_string_at_delimiter( raw_sites, ',' ) )
-    {
-        auto first = token.find_first_not_of( " \t\n\r" );
-        if( first == std::string::npos )
-        {
-            continue;
-        }
-        auto last = token.find_last_not_of( " \t\n\r" );
-        std::string trimmed = token.substr( first, last - first + 1 );
-        if( trimmed.empty() || std::any_of( trimmed.begin(), trimmed.end(), []( unsigned char c )
-        {
-            return c < '0' || c > '9';
-        } ) )
-        {
-            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
-        }
-        try
-        {
-            spin_sites.push_back( static_cast<uint>( std::stoul( trimmed ) ) );
-        }
-        catch( const std::exception& )
-        {
-            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
-        }
-    }
-    if( spin_sites.empty() )
-    {
-        throw std::runtime_error( "spin_sites must contain at least one site" );
-    }
-    auto sorted_sites = spin_sites;
-    std::sort( sorted_sites.begin(), sorted_sites.end() );
-    if( std::adjacent_find( sorted_sites.begin(), sorted_sites.end() ) != sorted_sites.end() )
-    {
-        throw std::runtime_error( "spin_sites must not contain duplicates" );
-    }
-    return spin_sites;
-}
-
-std::string spin_sites_to_string( const std::vector<uint>& sites, const char delimiter = ',' )
-{
-    std::stringstream ss;
-    for( size_t i = 0; i < sites.size(); ++i )
-    {
-        if( i > 0 )
-        {
-            ss << delimiter;
-        }
-        ss << sites[i];
-    }
-    return ss.str();
-}
-
-std::string spin_sites_to_filename_fragment( const std::vector<uint>& sites )
-{
-    std::stringstream ss;
-    for( size_t i = 0; i < sites.size(); ++i )
-    {
-        if( i > 0 )
-        {
-            ss << "-";
-        }
-        ss << sites[i];
-    }
-    return ss.str();
-}
-
-}
 
 // ===============================================================
 // ==================== PARAMETER SPACE CLASS ====================
@@ -418,6 +345,75 @@ std::string ParameterSpace::create_essentials_string() const
         ss << print::quantity_to_output_line( pre_colon_space, "lambda"          , print::remove_zeros(print::round_value_to_string(lambda,num_PrintDigits)) );
     }
     
+    return ss.str();
+}
+
+std::vector<uint> parse_spin_sites( const std::string& raw_sites )
+{
+    std::vector<uint> spin_sites{};
+    for( const auto& token : print::split_string_at_delimiter( raw_sites, ',' ) )
+    {
+        auto first = token.find_first_not_of( " \t\n\r" );
+        if( first == std::string::npos )
+        {
+            continue;
+        }
+        auto last = token.find_last_not_of( " \t\n\r" );
+        std::string trimmed = token.substr( first, last - first + 1 );
+        if( trimmed.empty() || std::any_of( trimmed.begin(), trimmed.end(), []( unsigned char c )
+        {
+            return c < '0' || c > '9';
+        } ) )
+        {
+            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
+        }
+        try
+        {
+            spin_sites.push_back( static_cast<uint>( std::stoul( trimmed ) ) );
+        }
+        catch( const std::exception& )
+        {
+            throw std::runtime_error( "spin_sites must be a comma-separated list of non-negative integers" );
+        }
+    }
+    if( spin_sites.empty() )
+    {
+        throw std::runtime_error( "spin_sites must contain at least one site" );
+    }
+    auto sorted_sites = spin_sites;
+    std::sort( sorted_sites.begin(), sorted_sites.end() );
+    if( std::adjacent_find( sorted_sites.begin(), sorted_sites.end() ) != sorted_sites.end() )
+    {
+        throw std::runtime_error( "spin_sites must not contain duplicates" );
+    }
+    return spin_sites;
+}
+
+std::string spin_sites_to_string( const std::vector<uint>& sites, const char delimiter = ',' )
+{
+    std::stringstream ss;
+    for( size_t i = 0; i < sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            ss << delimiter;
+        }
+        ss << sites[i];
+    }
+    return ss.str();
+}
+
+std::string spin_sites_to_filename_fragment( const std::vector<uint>& sites )
+{
+    std::stringstream ss;
+    for( size_t i = 0; i < sites.size(); ++i )
+    {
+        if( i > 0 )
+        {
+            ss << "-";
+        }
+        ss << sites[i];
+    }
     return ss.str();
 }
 
