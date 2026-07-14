@@ -2,7 +2,6 @@
 #include<functional>
 #include<algorithm>
 #include<cmath>
-#include<bit>
 #include<string>
 #include"../Types/Types.h"
 #include"../Parameter_Space/Parameter_Space.h"
@@ -121,7 +120,7 @@ void Hamiltonian::build_tables( const RealType shift )
         for( long ident = 0; ident < dim; ++ident )
         {
             // h_z * sum_i S_i^z = h_z/2 * (n_up - n_down)
-            const long n_up = std::popcount( static_cast<unsigned long long>( ident ) );
+            const long n_up = __builtin_popcountll( static_cast<unsigned long long>( ident ) );
             diag[ident] += RealType{0.5} * params.h_z * static_cast<RealType>( 2*n_up - numSpins );
         }
     }
