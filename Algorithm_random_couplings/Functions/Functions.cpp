@@ -8,7 +8,6 @@
 #include<cstdint>
 #include<stdexcept>
 #include <boost/math/special_functions/bessel.hpp>
-#include <boost/math/special_functions/lambert_w.hpp>
 #include<blaze/Math.h>
 #include<random>
 #include<iostream>
@@ -67,7 +66,8 @@ bool initialize_state( const ps::ParameterSpace& pspace, size_t seed, size_t sam
     state = State(pspace.HilbertSpaceDimension);
     if( pspace.full_diagonalization )
     {
-        size_t index = sample + pspace.my_rank * pspace.num_Vectors_Per_Core;
+        // configs are distributed over the ranks, so each rank loops the full basis
+        size_t index = sample;
         if( index < pspace.HilbertSpaceDimension )
         {
             state[index] = ComplexType{1.,0.};
@@ -265,25 +265,7 @@ States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site 
 }
 
 
-std::tuple<uint, uint> determine_CET_depth( const ham::Hamiltonian& H, const ps::ParameterSpace& pspace )
-// Determine the depth of the Chebyshev expansion needed to minimize the thermalization and evolution errors
-{
-    RealType factor_therm = H.a * pspace.beta * RealType{0.25} * std::exp(1.0);
-    RealType factor_evol = H.a * pspace.dt * RealType{0.5} * std::exp(1.0);
-    if( factor_therm == RealType{0.} )
-    {
-        return std::make_tuple( 0, 
-         static_cast<uint>(std::ceil( - std::log( pspace.CET_evol_error ) / boost::math::lambert_w0( - std::log( pspace.CET_evol_error ) / factor_evol ) ) ) );
-    }
-    else
-    {
-        return std::make_tuple(
-        static_cast<uint>(std::ceil( - std::log( pspace.CET_therm_error ) / boost::math::lambert_w0( - std::log( pspace.CET_therm_error ) / factor_therm ) ) ),
-        static_cast<uint>(std::ceil( - std::log( pspace.CET_evol_error ) / boost::math::lambert_w0( - std::log( pspace.CET_evol_error ) / factor_evol ) ) ) ); 
-    }
-   }
-
-ComplexType CET_coeff( int n, RealType t, RealType a, RealType b, std::string evol_type )
+ComplexType CET_coeff( int n, RealType t, RealType a, RealType b, const std::string& evol_type )
 // Compute the nth coefficient of the Chebyshev polynomial expansion.
 {   
     if( evol_type == "imaginary" )
@@ -311,46 +293,79 @@ ComplexType CET_coeff( int n, RealType t, RealType a, RealType b, std::string ev
     }
     }
 }
-void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type )
-// Apply e^(tH)/e^(-itH) to the state using the Chebyshev expansion technique.
-// The state is modified in place.
+std::vector<ComplexType> CET_coefficients( const RealType t, const RealType a, const RealType b, const std::string& evol_type, const RealType tolerance )
+// Precompute the Chebyshev expansion coefficients for e^(tH)/e^(-itH), truncated adaptively:
+// since |T_n(x)| <= 1 on [-1,1], the truncation error is bounded by the tail sum of |c_n|.
+// Once n >= |a*t| the Bessel magnitudes decay at least geometrically with ratio <= 1/2, so the
+// tail after the last kept order n is bounded by |c_n| itself. The criterion tests the Bessel
+// part without the common e^(bt) prefactor (a relative criterion, as in the old depth formula).
+// The n >= |a*t| guard also keeps the oscillatory regime of J_n (which passes through zeros)
+// from triggering a premature stop.
 {
-    State state_final = CET_coeff( 0, t, H.a, H.b, evol_type ) * state; // a_0|psi_0>
-    State state_aux = H.act( state ); // |psi_1> = H|psi_0>
-    state_final += CET_coeff( 1, t, H.a, H.b, evol_type ) * state_aux; // a_0|psi_0> + a_1|psi_1>
-   
-    for( uint n=2; n < depth + 1; n++ )
+    const RealType z = std::abs( a * t );
+    const bool imaginary = ( evol_type == "imaginary" );
+    std::vector<ComplexType> coeffs;
+    coeffs.push_back( CET_coeff( 0, t, a, b, evol_type ) );
+    for( int n = 1; ; ++n )
     {
-        state = 2 * H.act( state_aux ) - state; // |psi_n> = 2H|psi_n-1> - |psi_n-2>
-        state_final += CET_coeff( n, t, H.a, H.b, evol_type ) * state; // + a_n|psi_n> 
-        std::swap( state, state_aux );
+        coeffs.push_back( CET_coeff( n, t, a, b, evol_type ) );
+        const RealType bessel_part = imaginary ?
+            boost::math::cyl_bessel_i( static_cast<RealType>(n), z ) :
+            std::abs( boost::math::cyl_bessel_j( static_cast<RealType>(n), z ) );
+        if( static_cast<RealType>(n) >= z && RealType{2.} * bessel_part <= tolerance )
+        {
+            break;
+        }
+        if( n > 1000000 )
+        {
+            throw std::runtime_error( std::string("Chebyshev coefficients did not converge in ") + __PRETTY_FUNCTION__ );
+        }
     }
-    state = state_final;
+    return coeffs;
 }
 
-void MPI_share_results( RealType& partition_function, CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im )
+void CET( const ham::Hamiltonian& H, State& state, const std::vector<ComplexType>& coeffs )
+// Apply e^(tH)/e^(-itH) to the state using the Chebyshev expansion technique with
+// precomputed coefficients (see CET_coefficients). The state is modified in place.
+// The workspace buffers are allocated once and reused across all calls (each MPI
+// rank is single-threaded).
+{
+    static State state_final;
+    static State state_aux;
+    state_final.resize( state.size() );
+    state_aux.resize( state.size() );
+
+    state_final = coeffs[0] * state; // a_0|psi_0>
+    state_aux.reset();
+    H.act( state, state_aux ); // 2H|psi_0> - 0
+    state_aux *= RealType{0.5}; // |psi_1> = H|psi_0>
+    state_final += coeffs[1] * state_aux; // a_0|psi_0> + a_1|psi_1>
+
+    for( size_t n=2; n < coeffs.size(); n++ )
+    {
+        H.act( state_aux, state ); // |psi_n> = 2H|psi_n-1> - |psi_n-2>, in place
+        state_final += coeffs[n] * state; // + a_n|psi_n>
+        std::swap( state, state_aux );
+    }
+    std::swap( state, state_final ); // hand back the result, keep the old buffer as workspace
+}
+
+void MPI_share_results( CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im )
 // sum the results of all cores and broadcast the sum to all cores with MPI_Allreduce
 {
-    // share correlation results
-    std::for_each( correlations_Re.begin(), correlations_Re.end(), []( CorrelationVector& spin_c ) 
+    std::for_each( correlations_Re.begin(), correlations_Re.end(), []( CorrelationVector& spin_c )
     {
-        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        std::vector<RealType> rcv_buf( spin_c.size() );
         MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
         spin_c = rcv_buf;
     } );
 
-    std::for_each( correlations_Im.begin(), correlations_Im.end(), []( CorrelationVector& spin_c ) 
+    std::for_each( correlations_Im.begin(), correlations_Im.end(), []( CorrelationVector& spin_c )
     {
-        std::vector<RealType> rcv_buf( spin_c.size() ); 
+        std::vector<RealType> rcv_buf( spin_c.size() );
         MPI_Allreduce( spin_c.data(), rcv_buf.data(), spin_c.size(), MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
         spin_c = rcv_buf;
     } );
-
-    // share partition function results
-    std::vector<RealType> send_buf = { partition_function };
-    std::vector<RealType> receive_buf( 1 );
-    MPI_Allreduce( send_buf.data(), receive_buf.data(), 1, MPI_REALTYPE, MPI_SUM, MPI_COMM_WORLD );
-    partition_function = receive_buf.at(0);
 }
 
 void normalize( RealType& partition_function, CorrelationTensor& correlations )

@@ -30,7 +30,14 @@ std::vector<CorrelationTensor> covariances_Z_R( num_sites, CorrelationTensor{my_
 std::vector<CorrelationTensor> covariances_Z_I( num_sites, CorrelationTensor{my_pspace.symmetry_type, my_pspace.num_TimePoints} );
 RealType Z = RealType{0.};
 RealType Z_sq = RealType{0.};
-auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
+// Precompute the Chebyshev coefficient tables (adaptively truncated)
+std::vector<ComplexType> coeffs_therm;
+if( my_pspace.beta != RealType{0.} )
+{
+    coeffs_therm = func::CET_coefficients( -my_pspace.beta * RealType{0.5}, my_H.a, my_H.b, "imaginary", my_pspace.CET_therm_error );
+}
+const std::vector<ComplexType> coeffs_dt_plus = func::CET_coefficients( my_pspace.dt, my_H.a, my_H.b, my_pspace.evol_type, my_pspace.CET_evol_error );
+const std::vector<ComplexType> coeffs_dt_minus = func::CET_coefficients( -my_pspace.dt, my_H.a, my_H.b, my_pspace.evol_type, my_pspace.CET_evol_error );
 my_clock.measure("Initialization");
 
 tmm::Simple_Estimator my_estimator( my_rank, my_pspace.num_Vectors_Per_Core, "typicality sampling" );
@@ -51,7 +58,7 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     }
     if(my_pspace.beta != RealType{0.})
     {
-        func::CET( my_H, psi_L, -my_pspace.beta * RealType{0.5}, depth_beta, "imaginary" ); // e^(-beta*H/2)|psi_0>
+        func::CET( my_H, psi_L, coeffs_therm ); // e^(-beta*H/2)|psi_0>
     }
     RealType Z_sample  = std::pow( std::real(blaze::norm(psi_L)) , 2 );
     Z += Z_sample; // Z = <psi_0|e^(-beta*H)|psi_0>
@@ -62,11 +69,11 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     func::compute_correlations_at_sites( 0, my_pspace, psi_L, v_psi_R, my_pspace.spin_sites, new_correlations_R, new_correlations_I, new_correlations_R_sq, new_correlations_I_sq );
     for( uint t_point = 1; t_point < my_pspace.num_TimePoints; t_point++ )
     {
-        std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &my_pspace, &depth_dt]( State& psi_R )
+        std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &coeffs_dt_minus]( State& psi_R )
         {
-        func::CET( my_H, psi_R, -my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
+        func::CET( my_H, psi_R, coeffs_dt_minus ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
         } );
-        func::CET( my_H, psi_L, my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(tau H) e^(-beta H/2)|psi_0>
+        func::CET( my_H, psi_L, coeffs_dt_plus ); // e^(tau H) e^(-beta H/2)|psi_0>
         func::compute_correlations_at_sites( t_point, my_pspace, psi_L, v_psi_R, my_pspace.spin_sites, new_correlations_R, new_correlations_I, new_correlations_R_sq, new_correlations_I_sq ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_i e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
     }
     for( size_t site_idx = 0; site_idx < num_sites; ++site_idx )

@@ -217,7 +217,8 @@ ParameterSpace::ParameterSpace( const int argC, char* const argV[], const int wo
     if( vm.count("fulldiag") )
     {
         full_diagonalization = true;
-        num_Vectors_Per_Core = HilbertSpaceDimension / static_cast<uint>(world_size) + 1;
+        // configs are distributed over the ranks, so each rank loops the full basis of its configs
+        num_Vectors_Per_Core = HilbertSpaceDimension;
     }
     E_max = vm["E_max"].as<RealType>();
     E_min = vm["E_min"].as<RealType>();

@@ -26,17 +26,34 @@ CorrelationTensor sqsum_R( my_pspace.symmetry_type, my_pspace.num_TimePoints );
 CorrelationTensor sqsum_I( my_pspace.symmetry_type, my_pspace.num_TimePoints );
 my_clock.measure("Initialization");
 
-for( int i=0; i<my_pspace.num_Coupling_Configs; i++ )
+// Distribute the disorder configurations across the MPI ranks: each rank handles its
+// configs entirely on its own (couplings, Lanczos bandwidth, typicality sampling and the
+// per-config normalization by Z); the config sums are reduced once after the loop.
+// Each config is sampled with num_Vectors_Per_Core typicality vectors.
+const uint num_local_configs = ( static_cast<uint>(my_rank) < my_pspace.num_Coupling_Configs ) ?
+    ( my_pspace.num_Coupling_Configs - static_cast<uint>(my_rank) + static_cast<uint>(world_size) - 1 ) / static_cast<uint>(world_size) : 0;
+tmm::Simple_Estimator my_estimator( my_rank, num_local_configs, "disorder sampling" );
+my_estimator.enter_loop();
+uint local_config = 0;
+for( uint i = static_cast<uint>(my_rank); i < my_pspace.num_Coupling_Configs; i += static_cast<uint>(world_size) )
 {
 my_pspace.draw_couplings( seed, i );
 ham::Hamiltonian my_H( my_pspace );
 CorrelationTensor correlations_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 CorrelationTensor correlations_I{my_pspace.symmetry_type, my_pspace.num_TimePoints};
 RealType Z = RealType{0.};
-auto [depth_beta, depth_dt] = func::determine_CET_depth( my_H, my_pspace );
-tmm::Simple_Estimator my_estimator( my_rank, my_pspace.num_Vectors_Per_Core, "typicality sampling" );
+// Precompute the Chebyshev coefficient tables (adaptively truncated); the bandwidth
+// a, b changes with each coupling configuration, so the tables are per-config
+std::vector<ComplexType> coeffs_therm;
+if( my_pspace.beta != RealType{0.} )
+{
+    coeffs_therm = func::CET_coefficients( -my_pspace.beta * RealType{0.5}, my_H.a, my_H.b, "imaginary", my_pspace.CET_therm_error );
+}
+const std::vector<ComplexType> coeffs_dt_plus = func::CET_coefficients( my_pspace.dt, my_H.a, my_H.b, my_pspace.evol_type, my_pspace.CET_evol_error );
+const std::vector<ComplexType> coeffs_dt_minus = func::CET_coefficients( -my_pspace.dt, my_H.a, my_H.b, my_pspace.evol_type, my_pspace.CET_evol_error );
+// mix the config index into the seed so every config is sampled with independent states
+const size_t config_seed = func::throw_seed( seed, static_cast<size_t>(i), 0 );
 
-my_estimator.enter_loop();
 // ====== Main loop ======
 for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
 {
@@ -44,13 +61,13 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     CorrelationTensor new_correlations_I(my_pspace.symmetry_type, my_pspace.num_TimePoints);
     // Initialize and thermalize
     State psi_L;
-    if( !func::initialize_state( my_pspace, seed, k, psi_L ) )
+    if( !func::initialize_state( my_pspace, config_seed, k, psi_L ) )
     {
         continue;
     }
     if(my_pspace.beta != RealType{0.})
     {
-        func::CET( my_H, psi_L, -my_pspace.beta * RealType{0.5}, depth_beta, "imaginary" ); // e^(-beta*H/2)|psi_0>
+        func::CET( my_H, psi_L, coeffs_therm ); // e^(-beta*H/2)|psi_0>
     }
     Z += std::pow( std::real(blaze::norm(psi_L)) , 2 ); // Z = <psi_0|e^(-beta*H)|psi_0>
     // Evolve: loop over times
@@ -59,25 +76,28 @@ for( int k=0; k < my_pspace.num_Vectors_Per_Core; k++ )
     func::compute_correlations_at( 0, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I );
     for( uint t_point = 1; t_point < my_pspace.num_TimePoints; t_point++ )
     {
-        std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &my_pspace, &depth_dt]( State& psi_R )
+        std::for_each( v_psi_R.begin(), v_psi_R.end(), [&my_H, &coeffs_dt_minus]( State& psi_R )
         {
-        func::CET( my_H, psi_R, -my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
+        func::CET( my_H, psi_R, coeffs_dt_minus ); // e^(-tau H) S^a_0 e^(-beta H/2)|psi_0>
         } );
-        func::CET( my_H, psi_L, my_pspace.dt, depth_dt, my_pspace.evol_type ); // e^(tau H) e^(-beta H/2)|psi_0>
+        func::CET( my_H, psi_L, coeffs_dt_plus ); // e^(tau H) e^(-beta H/2)|psi_0>
         func::compute_correlations_at( t_point, 0, my_pspace, psi_L, v_psi_R, new_correlations_R, new_correlations_I ); // <psi_0|e^(-beta H/2) e^(tau H) S^a_0 e^(-tau H) S^b_0 e^(-beta H/2)|psi_0>
     }
     correlations_R += new_correlations_R;
     correlations_I += new_correlations_I;
-    my_estimator.estimate(k);
 }
-my_estimator.leave_loop();
-func::MPI_share_results( Z, correlations_R, correlations_I );
+// all typicality vectors of this config live on this rank: normalize locally
 func::normalize( Z, correlations_R );
 func::normalize( Z, correlations_I );
 averaged_correlations_R += correlations_R;
 averaged_correlations_I += correlations_I;
 func::add_sqs( correlations_R, correlations_I, sqsum_R, sqsum_I );
+my_estimator.estimate( local_config++ );
 }
+my_estimator.leave_loop();
+// sum the per-config results over all ranks
+func::MPI_share_results( averaged_correlations_R, averaged_correlations_I );
+func::MPI_share_results( sqsum_R, sqsum_I );
 RealType N = static_cast<RealType>(my_pspace.num_Coupling_Configs);
 
 CorrelationTensor stds_R{my_pspace.symmetry_type, my_pspace.num_TimePoints};

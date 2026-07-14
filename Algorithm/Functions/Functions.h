@@ -16,7 +16,7 @@ namespace Functions
 using CorrelationTensor = Tensors::CorrelationTensor<Correlations::CorrelationVector>;
 using CorrelationVector = Correlations::CorrelationVector;
 
-std::tuple<uint, uint> determine_CET_depth( const ham::Hamiltonian& H, const ps::ParameterSpace& pspace );
+std::vector<ComplexType> CET_coefficients( const RealType t, const RealType a, const RealType b, const std::string& evol_type, const RealType tolerance );
 
 ComplexType cdot( const State& state1, const State& state2 );
 
@@ -33,7 +33,7 @@ State S_alpha_i_act( const State& state, const long site, char alpha );
 
 States S_i_act( const ps::ParameterSpace& pspace, State& state, const long site );
 
-void CET( ham::Hamiltonian& H, State& state, const RealType t, uint depth, std::string evol_type );
+void CET( const ham::Hamiltonian& H, State& state, const std::vector<ComplexType>& coeffs );
 
 void MPI_share_results( RealType& partition_function, RealType& partition_function_sq,
                         CorrelationTensor& correlations_Re, CorrelationTensor& correlations_Im, 
