@@ -245,8 +245,8 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
         for( uint j = i+1; j < num_Spins; ++j )
         {
             couplings(i,j) = d(gen);
-            JQ += std::pow( couplings(i,j), 2 );
         }
+        JQ += std::pow( couplings(0,i), 2 );
     }
     if( JQ == RealType{0.} )
     {
