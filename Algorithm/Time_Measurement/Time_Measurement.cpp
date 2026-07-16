@@ -101,18 +101,21 @@ void Simple_Estimator::estimate( const int iteration )
     }
     RealType progress = static_cast<RealType>(iteration + 1) / static_cast<RealType>(num_iterations);
     int bar_width = 50; // Width of the progress bar
-    print::print_R0(my_rank, "\r[");
     int filled = static_cast<int>(bar_width * progress);
-    for (int i = 0; i < filled; ++i)
+    std::string bar = "[" + std::string(filled, '=') + std::string(bar_width - filled, ' ')
+        + "] " + std::to_string(static_cast<int>(progress * 100)) + "%";
+    // Each update still ends with a real newline: on a cluster, mpirun/srun forward
+    // stdout through pty/pipe/log layers that only surface a line once it sees "\n",
+    // so a bare "\r" update alone never showed up until the run ended. To still show
+    // a single overwriting bar in a real terminal, move the cursor back up to the
+    // previous line and clear it before printing the next one; a plain-text viewer
+    // opening the finished log just sees a few stray control characters.
+    if( iteration > 0 )
     {
-        print::print_R0(my_rank, "=");
+        print::print_R0(my_rank, "\033[F\033[K");
     }
-    for (int i = filled; i < bar_width; ++i)
-    {
-        print::print_R0(my_rank, " ");
-    }
-    print::print_R0(my_rank, "] " + std::to_string(static_cast<int>(progress * 100)) + "%");
-    std::cout.flush(); // Carriage return to overwrite the line
+    print::print_R0(my_rank, bar + "\n");
+    std::cout.flush();
 }
 
 void Simple_Estimator::leave_loop()

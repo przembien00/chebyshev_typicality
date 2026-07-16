@@ -1,20 +1,40 @@
+from __future__ import annotations
+
 import glob
 import os
 import re
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parent
+MPL_CONFIG_DIR = ROOT / ".mplconfig"
+XDG_CACHE_DIR = ROOT / ".cache"
+MPL_CONFIG_DIR.mkdir(exist_ok=True)
+XDG_CACHE_DIR.mkdir(exist_ok=True)
+
+os.environ.setdefault("HDF5_USE_FILE_LOCKING", "FALSE")
+os.environ.setdefault("MPLBACKEND", "Agg")
+os.environ.setdefault("MPLCONFIGDIR", str(MPL_CONFIG_DIR))
+os.environ.setdefault("XDG_CACHE_HOME", str(XDG_CACHE_DIR))
+
+import matplotlib as mpl
+
+mpl.rc_file(str(ROOT / "matplotlibrc"))
 
 import h5py as h5
 import matplotlib.pyplot as plt
 import numpy as np
 
-DATA_DIR = "Data/Random_realtime"
-SPINDMFT_DIR = "Data/spinDMFT_realtime"
+DATA_DIR = ROOT / "Data" / "Real_Time"
+SPINDMFT_DIR = ROOT / "Data" / "spinDMFT_realtime"
 BETA_ARRAY = [0.5, 1.5, 2.5]
 
 
 def find_files():
     files = {}
-    for path in glob.glob(f"{DATA_DIR}/ISO__Random__N=*__beta=*__numConfigs=*.hdf5"):
-        m = re.search(r"N=(\d+)__beta=([\d.]+)", path)
+    for path in glob.glob(f"{DATA_DIR}/ISO__Square_NN_PBC_N=*__beta=*__rescale=*.hdf5"):
+        m = re.search(r"N=(\d+)__beta=([\d.]+)__rescale=", path)
+        if m is None:
+            continue
         N, beta = int(m.group(1)), float(m.group(2))
         files[(N, beta)] = path
     return files
@@ -24,16 +44,16 @@ def load(path):
     f = h5.File(path, "r")
     params = f["parameters"].attrs
     t = np.linspace(0.0, params["Tmax"], params["num_TimePoints"])
-    re = f["results"]["Re_correlation"][0]
-    re_err = f["results"]["Re_stddev"][0]
-    im = f["results"]["Im_correlation"][0]
-    im_err = f["results"]["Im_stddev"][0]
+    re = f["results"]["Re_correlation"]["0-0"][0]
+    re_err = f["results"]["Re_stds"]["0-0"][0]
+    im = f["results"]["Im_correlation"]["0-0"][0]
+    im_err = f["results"]["Im_stds"]["0-0"][0]
     return t, re, re_err, im, im_err
 
 
 def load_spindmft(beta):
-    path = f"{SPINDMFT_DIR}/spinmodel=ISO__beta={beta}__realtime.hdf5"
-    if not os.path.exists(path):
+    path = SPINDMFT_DIR / f"spinmodel=ISO__beta={beta}__realtime.hdf5"
+    if not path.exists():
         return None
     f = h5.File(path, "r")
     t = f["real_time"][:]
@@ -60,14 +80,14 @@ def extrapolate_1_over_N(Ns, values, errors):
 
 
 files = find_files()
-N_array = sorted({N for N, _ in files})
+N_array = sorted({N for N, beta in files if beta in BETA_ARRAY})
 
-color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+color_cycle = [c for c in plt.rcParams["axes.prop_cycle"].by_key()["color"] if c != "red"]
 colors = {N: color_cycle[i % len(color_cycle)] for i, N in enumerate(N_array)}
 
 PARTS = [
-    ("re", 1, 2, r"$\mathrm{Re}\,g^{xx}(t)$", "Plots/Plot_realtime_random_re.pdf"),
-    ("im", 3, 4, r"$\mathrm{Im}\,g^{xx}(t)$", "Plots/Plot_realtime_random_im.pdf"),
+    ("re", 1, 2, r"$\mathrm{Re}\,g^{xx}(t)$", "Plots/Plot_realtime_square_re.pdf"),
+    ("im", 3, 4, r"$\mathrm{Im}\,g^{xx}(t)$", "Plots/Plot_realtime_square_im.pdf"),
 ]
 
 for kind, value_idx, err_idx, ylabel, outpath in PARTS:
@@ -94,24 +114,24 @@ for kind, value_idx, err_idx, ylabel, outpath in PARTS:
             C, C_err = extrapolate_1_over_N(fit_Ns, fit_values, fit_errors)
             ax.errorbar(
                 t_common, C, yerr=C_err, errorevery=5, capsize=2,
-                color="black", linestyle="--", zorder=11, label=r"$N=\infty$",
+                color="black", linestyle="--", label=r"$N=\infty$", zorder=11,
             )
 
         spindmft = load_spindmft(beta)
         if spindmft is not None:
             t_dmft, c_real, c_imag = spindmft
             c = c_real if kind == "re" else -c_imag
-            ax.plot(
-                t_dmft, c, color="red", linestyle="-", linewidth=2.5,
-                zorder=10, label="spinDMFT",
-            )
+            ax.plot(t_dmft, c, color="red", linestyle="-", linewidth=3, label="spinDMFT", zorder=10)
 
         ax.set_title(rf"$\beta J_Q={beta}$")
         ax.set_xlabel(r"$t J_Q$")
         ax.set_xlim(0, 10)
 
+    handles, labels = axes[0].get_legend_handles_labels()
+    order = sorted(range(len(labels)), key=lambda i: {r"$N=\infty$": 0, "spinDMFT": 1}.get(labels[i], 2))
+    axes[0].legend([handles[i] for i in order], [labels[i] for i in order])
     axes[0].set_ylabel(ylabel)
-    axes[0].legend()
 
     fig.tight_layout()
     fig.savefig(outpath)
+    plt.close(fig)
