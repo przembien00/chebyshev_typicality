@@ -62,7 +62,7 @@ def extrapolate_1_over_N(Ns, values, errors):
 files = find_files()
 N_array = sorted({N for N, _ in files})
 
-color_cycle = plt.rcParams["axes.prop_cycle"].by_key()["color"]
+color_cycle = [c for c in plt.rcParams["axes.prop_cycle"].by_key()["color"] if c != "red"]
 colors = {N: color_cycle[i % len(color_cycle)] for i, N in enumerate(N_array)}
 
 PARTS = [
