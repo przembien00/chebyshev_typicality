@@ -37,8 +37,6 @@ else
 	exit 0
 fi
 
-cd "../chebyshev_typicality"
-
 echo "--- START ---"
 
 
@@ -51,7 +49,7 @@ if [ -z "$symm" ]; then
 fi
 
 echo "RUNNING JOB WITH N = $N, BETA = $beta, numCouplingConfigs = $numConfigs, h_z = $h_z, symm_type = $symm"
-mpirun -n 16 executable_rc_DOUBLE.out --beta=$beta --numSpins=$N --numTimePoints=100 --spinmodel=ISO --fulldiag --numCouplingConfigs=$numConfigs --h_z=$h_z --symm_type=$symm --evol_type=imaginary --project=Random_imagtime
+mpirun -n 16 executable_rc_DOUBLE.out --beta=$beta --numSpins=$N --numTimePoints=100 --spinmodel=ISO --fulldiag --numCouplingConfigs=$numConfigs --h_z=$h_z --symm_type=$symm --project=Random_imagtime
 
 echo "--- END ---"
 date
