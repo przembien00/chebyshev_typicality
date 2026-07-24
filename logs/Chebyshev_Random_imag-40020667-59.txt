@@ -1,0 +1,16 @@
+Fri Jul 24 05:30:25 CEST 2026
+--- START ---
+RUNNING JOB WITH N = 13, BETA = 2.5, numCouplingConfigs = 250, h_z = 0.5, symm_type = C
+spin_model                         : ISO
+num_Spins                          : 13
+beta                               : 2.5
+h_z                                : 0.5
+num_TimePoints                     : 100
+dt                                 : 0.0126
+num_Vectors                        : 131072
++++++++++++++++++++++++++++++++++++++++++++++++++++++
+[1;36mInitialization done, took 57 ms[0m
+Single iteration duration: 6778 s
+Estimated duration of disorder sampling: 1807 min
+---------- [1mProgress of disorder sampling[0m ----------
+[===                                               ] 6%[======                                            ] 12%
