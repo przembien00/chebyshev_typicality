@@ -9,7 +9,7 @@
 #SBATCH --job-name=Chebyshev_Random_imag_missing
 #SBATCH --output=logs/%x-%A-%a.txt    ## File for stdout & stderr
 #SBATCH --error=logs/%x-%A-%a.err
-#SBATCH --time=72:00:00		## maximum runtime; hours:minutes:seconds
+#SBATCH --time=48:00:00		## maximum runtime; hours:minutes:seconds
 #SBATCH --partition=long		## choose queue
 
 #SBATCH --ntasks=16		## number of tasks has to be = 1 for single core jobs
