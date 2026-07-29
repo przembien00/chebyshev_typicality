@@ -1,16 +1,41 @@
 
-
 # do not upload Makefile
 Makefile
 
 # do not upload executables
 *executable*
+*.out
+*.o
 
 # do not upload build directories
 build/
 
 # do not upload plots
 Plots/
+*.png
+*.pdf
 
 # do not upload data CMakeLists
 CMakeLists.txt
+
+# do not upload macOS metadata
+.DS_Store
+
+# do not upload cache
+__pycache__/
+*.pyc
+
+# do not upload editor settings
+.vscode/
+.idea/
+
+# do not upload matplotlib font cache
+.mplconfig/fontlist-*.json
+.mplconfig/tex.cache/
+
+# do not upload cluster job logs
+logs/
+error.txt
+*.err
+slurm-*.out
+*.log
