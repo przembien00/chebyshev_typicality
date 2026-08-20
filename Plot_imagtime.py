@@ -56,6 +56,19 @@ colors = {N: color_cycle[i % len(color_cycle)] for i, N in enumerate(N_array)}
 ylabel = r"$g^{xx}(\tau)$"
 outpath = "Plots/Plot_imagtime_random.pdf"
 
+def resolve_fontsize(key):
+    """Resolve an rcParam font size (which may be a named size like 'small') to points."""
+    size = plt.rcParams[key]
+    if isinstance(size, str):
+        size = plt.rcParams["font.size"] * plt.matplotlib.font_manager.font_scalings[size]
+    return size
+
+
+label_fontsize = resolve_fontsize("axes.labelsize")
+title_fontsize = resolve_fontsize("axes.titlesize")
+tick_fontsize = resolve_fontsize("xtick.labelsize")
+legend_fontsize = resolve_fontsize("legend.fontsize")
+
 fig, axes = plt.subplots(1, len(BETA_ARRAY), figsize=(5 * len(BETA_ARRAY), 4.5), sharey=True)
 
 for ax, beta in zip(axes, BETA_ARRAY):
@@ -83,12 +96,13 @@ for ax, beta in zip(axes, BETA_ARRAY):
             color="black", linestyle="--", zorder=11, label=r"$N=\infty$",
         )
 
-    ax.set_title(rf"$\beta J_Q={beta}$")
-    ax.set_xlabel(r"$\tau / \beta$")
+    ax.set_title(rf"$\beta J_Q={beta}$", fontsize=title_fontsize + 2)
+    ax.set_xlabel(r"$\tau / \beta$", fontsize=label_fontsize + 2)
     ax.set_xlim(0, 0.5)
+    ax.tick_params(labelsize=tick_fontsize + 1)
 
-axes[0].set_ylabel(ylabel)
-axes[0].legend()
+axes[0].set_ylabel(ylabel, fontsize=label_fontsize + 2)
+axes[0].legend(fontsize=legend_fontsize + 2)
 
 fig.tight_layout()
 fig.savefig(outpath)

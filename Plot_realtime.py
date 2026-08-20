@@ -10,6 +10,16 @@ DATA_DIR = "Data/Random_realtime"
 SPINDMFT_DIR = "Data/spinDMFT_realtime"
 BETA_ARRAY = [0.5, 1.5, 2.5]
 
+_base = plt.rcParams["font.size"]
+plt.rcParams.update({
+    "font.size": _base + 2,
+    "axes.titlesize": _base * 1.2 + 2,
+    "axes.labelsize": _base * 1.0 + 4,
+    "xtick.labelsize": plt.rcParams["xtick.labelsize"] + 3,
+    "ytick.labelsize": plt.rcParams["ytick.labelsize"] + 3,
+    "legend.fontsize": _base * 0.833 + 2,
+})
+
 
 def find_files():
     files = {}
@@ -66,14 +76,18 @@ color_cycle = [c for c in plt.rcParams["axes.prop_cycle"].by_key()["color"] if c
 colors = {N: color_cycle[i % len(color_cycle)] for i, N in enumerate(N_array)}
 
 PARTS = [
-    ("re", 1, 2, r"$\mathrm{Re}\,g^{xx}(t)$", "Plots/Plot_realtime_random_re.pdf"),
-    ("im", 3, 4, r"$\mathrm{Im}\,g^{xx}(t)$", "Plots/Plot_realtime_random_im.pdf"),
+    ("re", 1, 2, r"Re $g^{xx}(t)$"),
+    ("im", 3, 4, r"Im $g^{xx}(t)$"),
 ]
 
-for kind, value_idx, err_idx, ylabel, outpath in PARTS:
-    fig, axes = plt.subplots(1, len(BETA_ARRAY), figsize=(5 * len(BETA_ARRAY), 4.5), sharey=True)
+fig, axes = plt.subplots(
+    len(PARTS), len(BETA_ARRAY), figsize=(5 * len(BETA_ARRAY), 4.5 * len(PARTS)),
+    sharex="col", sharey="row",
+)
 
-    for ax, beta in zip(axes, BETA_ARRAY):
+for row, (kind, value_idx, err_idx, ylabel) in enumerate(PARTS):
+    for col, beta in enumerate(BETA_ARRAY):
+        ax = axes[row, col]
         t_common = None
         fit_values, fit_errors, fit_Ns = [], [], []
         for N in N_array:
@@ -106,12 +120,16 @@ for kind, value_idx, err_idx, ylabel, outpath in PARTS:
                 zorder=10, label="spinDMFT",
             )
 
-        ax.set_title(rf"$\beta J_Q={beta}$")
-        ax.set_xlabel(r"$t J_Q$")
         ax.set_xlim(0, 10)
+        if row == 0:
+            ax.set_title(rf"$\beta J_Q={beta}$")
+        if row == len(PARTS) - 1:
+            ax.set_xlabel(r"$t J_Q$")
+        if col == 0:
+            ax.set_ylabel(ylabel)
 
-    axes[0].set_ylabel(ylabel)
-    axes[0].legend()
+axes[0, 0].legend()
 
-    fig.tight_layout()
-    fig.savefig(outpath)
+fig.tight_layout()
+fig.subplots_adjust(hspace=0)
+fig.savefig("Plots/Plot_realtime_random.pdf")

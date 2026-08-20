@@ -237,6 +237,7 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
 {
     std::mt19937 gen{ static_cast<uint>( seed + 1000 * config ) };
     std::normal_distribution<RealType> d{0., 1.0};
+    RealType coupling_sum = RealType{0.};
     RealType JQ = RealType{0.};
     couplings.resize( num_Spins );
     for( uint i = 0; i < num_Spins; ++i )
@@ -245,9 +246,25 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
         for( uint j = i+1; j < num_Spins; ++j )
         {
             couplings(i,j) = d(gen);
+            coupling_sum += couplings(i,j);
+        }
+    }
+
+    const size_t num_couplings = static_cast<size_t>(num_Spins) * (num_Spins - 1) / 2;
+    if( num_couplings < 2 )
+    {
+        throw std::runtime_error( "at least three spins are required for zero-mean normalized random couplings" );
+    }
+    const RealType coupling_mean = coupling_sum / static_cast<RealType>(num_couplings);
+    for( uint i = 0; i < num_Spins; ++i )
+    {
+        for( uint j = i+1; j < num_Spins; ++j )
+        {
+            couplings(i,j) -= coupling_mean;
         }
         JQ += std::pow( couplings(0,i), 2 );
     }
+
     if( JQ == RealType{0.} )
     {
         throw std::runtime_error( "failed to generate nonzero random couplings" );

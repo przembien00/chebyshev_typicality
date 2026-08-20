@@ -28,6 +28,16 @@ DATA_DIR = ROOT / "Data" / "Real_Time"
 SPINDMFT_DIR = ROOT / "Data" / "spinDMFT_realtime"
 BETA_ARRAY = [0.5, 1.5, 2.5]
 
+_base = plt.rcParams["font.size"]
+plt.rcParams.update({
+    "font.size": _base + 2,
+    "axes.titlesize": _base * 1.2 + 2,
+    "axes.labelsize": _base * 1.0 + 4,
+    "xtick.labelsize": plt.rcParams["xtick.labelsize"] + 3,
+    "ytick.labelsize": plt.rcParams["ytick.labelsize"] + 3,
+    "legend.fontsize": _base * 0.833 + 2,
+})
+
 
 def find_files():
     files = {}
@@ -86,14 +96,18 @@ color_cycle = [c for c in plt.rcParams["axes.prop_cycle"].by_key()["color"] if c
 colors = {N: color_cycle[i % len(color_cycle)] for i, N in enumerate(N_array)}
 
 PARTS = [
-    ("re", 1, 2, r"$\mathrm{Re}\,g^{xx}(t)$", "Plots/Plot_realtime_square_re.pdf"),
-    ("im", 3, 4, r"$\mathrm{Im}\,g^{xx}(t)$", "Plots/Plot_realtime_square_im.pdf"),
+    ("re", 1, 2, r"Re $g^{xx}(t)$"),
+    ("im", 3, 4, r"Im $g^{xx}(t)$"),
 ]
 
-for kind, value_idx, err_idx, ylabel, outpath in PARTS:
-    fig, axes = plt.subplots(1, len(BETA_ARRAY), figsize=(5 * len(BETA_ARRAY), 4.5), sharey=True)
+fig, axes = plt.subplots(
+    len(PARTS), len(BETA_ARRAY), figsize=(5 * len(BETA_ARRAY), 4.5 * len(PARTS)),
+    sharex="col", sharey="row",
+)
 
-    for ax, beta in zip(axes, BETA_ARRAY):
+for row, (kind, value_idx, err_idx, ylabel) in enumerate(PARTS):
+    for col, beta in enumerate(BETA_ARRAY):
+        ax = axes[row, col]
         t_common = None
         fit_values, fit_errors, fit_Ns = [], [], []
         for N in N_array:
@@ -114,24 +128,30 @@ for kind, value_idx, err_idx, ylabel, outpath in PARTS:
             C, C_err = extrapolate_1_over_N(fit_Ns, fit_values, fit_errors)
             ax.errorbar(
                 t_common, C, yerr=C_err, errorevery=5, capsize=2,
-                color="black", linestyle="--", label=r"$N=\infty$", zorder=11,
+                color="black", linestyle="--", zorder=11, label=r"$N=\infty$",
             )
 
         spindmft = load_spindmft(beta)
         if spindmft is not None:
             t_dmft, c_real, c_imag = spindmft
             c = c_real if kind == "re" else -c_imag
-            ax.plot(t_dmft, c, color="red", linestyle="-", linewidth=3, label="spinDMFT", zorder=10)
+            ax.plot(
+                t_dmft, c, color="red", linestyle="-", linewidth=2.5,
+                zorder=10, label="spinDMFT",
+            )
 
-        ax.set_title(rf"$\beta J_Q={beta}$")
-        ax.set_xlabel(r"$t J_Q$")
         ax.set_xlim(0, 10)
+        if row == 0:
+            ax.set_title(rf"$\beta J_Q={beta}$")
+        if row == len(PARTS) - 1:
+            ax.set_xlabel(r"$t J_Q$")
+        if col == 0:
+            ax.set_ylabel(ylabel)
 
-    handles, labels = axes[0].get_legend_handles_labels()
-    order = sorted(range(len(labels)), key=lambda i: {r"$N=\infty$": 0, "spinDMFT": 1}.get(labels[i], 2))
-    axes[0].legend([handles[i] for i in order], [labels[i] for i in order])
-    axes[0].set_ylabel(ylabel)
+handles, labels = axes[0, 0].get_legend_handles_labels()
+order = sorted(range(len(labels)), key=lambda i: {"spinDMFT": 0, r"$N=\infty$": 2}.get(labels[i], 1))
+axes[0, 0].legend([handles[i] for i in order], [labels[i] for i in order])
 
-    fig.tight_layout()
-    fig.savefig(outpath)
-    plt.close(fig)
+fig.tight_layout()
+fig.subplots_adjust(hspace=0)
+fig.savefig("Plots/Plot_realtime_square.pdf")
