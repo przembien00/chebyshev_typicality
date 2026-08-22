@@ -237,8 +237,12 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
 {
     std::mt19937 gen{ static_cast<uint>( seed + 1000 * config ) };
     std::normal_distribution<RealType> d{0., 1.0};
-    RealType coupling_sum = RealType{0.};
+    RealType reference_coupling_sum = RealType{0.};
     RealType JQ = RealType{0.};
+    if( num_Spins < 3 )
+    {
+        throw std::runtime_error( "at least three spins are required for zero-mean normalized random couplings" );
+    }
     couplings.resize( num_Spins );
     for( uint i = 0; i < num_Spins; ++i )
     {
@@ -246,21 +250,19 @@ void ParameterSpace::draw_couplings( uint seed, uint config )
         for( uint j = i+1; j < num_Spins; ++j )
         {
             couplings(i,j) = d(gen);
-            coupling_sum += couplings(i,j);
         }
     }
 
-    const size_t num_couplings = static_cast<size_t>(num_Spins) * (num_Spins - 1) / 2;
-    if( num_couplings < 2 )
+    for( uint i = 1; i < num_Spins; ++i )
     {
-        throw std::runtime_error( "at least three spins are required for zero-mean normalized random couplings" );
+        reference_coupling_sum += couplings(i,0);
     }
-    const RealType coupling_mean = coupling_sum / static_cast<RealType>(num_couplings);
+    const RealType reference_coupling_mean = reference_coupling_sum / static_cast<RealType>(num_Spins - 1);
     for( uint i = 0; i < num_Spins; ++i )
     {
         for( uint j = i+1; j < num_Spins; ++j )
         {
-            couplings(i,j) -= coupling_mean;
+            couplings(i,j) -= reference_coupling_mean;
         }
         JQ += std::pow( couplings(0,i), 2 );
     }

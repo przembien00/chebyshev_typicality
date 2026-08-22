@@ -7,6 +7,7 @@ the stddev.  Output mirrors the input HDF5 layout so existing tooling can read
 the extrapolated files the same way.
 """
 
+import argparse
 import glob
 import os
 import re
@@ -36,16 +37,21 @@ def extrapolate_1_over_N(Ns, values, errors):
     return C, C_err
 
 
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("--src-dir", default=SRC_DIR, help="input HDF5 directory")
+parser.add_argument("--out-dir", default=OUT_DIR, help="output HDF5 directory")
+args = parser.parse_args()
+
 # Group source files by (beta_string, h_z_string-or-None)
 groups = {}
-for path in glob.glob(f"{SRC_DIR}/ISO__Random__N=*__beta=*__numConfigs=*.hdf5"):
+for path in glob.glob(f"{args.src_dir}/ISO__Random__N=*__beta=*__numConfigs=*.hdf5"):
     m = re.search(r"N=(\d+)__beta=([\d.]+)(__h_z=([\d.]+))?", os.path.basename(path))
     N = int(m.group(1))
     beta_str = m.group(2)
     hz_str = m.group(4)  # None for zero-field files
     groups.setdefault((beta_str, hz_str), {})[N] = path
 
-os.makedirs(OUT_DIR, exist_ok=True)
+os.makedirs(args.out_dir, exist_ok=True)
 
 for (beta_str, hz_str), by_N in sorted(groups.items(), key=lambda kv: (float(kv[0][0]), kv[0][1] or "")):
     Ns = sorted(by_N)
@@ -68,7 +74,7 @@ for (beta_str, hz_str), by_N in sorted(groups.items(), key=lambda kv: (float(kv[
     if hz_str is not None:
         out_name += f"__h_z={hz_str}"
     out_name += ".hdf5"
-    out_path = os.path.join(OUT_DIR, out_name)
+    out_path = os.path.join(args.out_dir, out_name)
 
     src_ref = by_N[Ns[-1]]  # largest N, used as attribute template
     with h5.File(src_ref, "r") as fsrc, h5.File(out_path, "w") as fout:
